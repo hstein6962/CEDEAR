@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monitor CEDEAR · CCL Implícito</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #080a0f;
+  --s1:       #0e1118;
+  --s2:       #141820;
+  --s3:       #1c2230;
+  --border:   #1f2840;
+  --ink:      #dde3f0;
+  --muted:    #4a5570;
+  --dim:      #2a3450;
+  --buy:      #00e676;
+  --sell:     #ff3d57;
+  --neutral:  #40b4f5;
+  --gold:     #f0b040;
+  --buy-bg:   rgba(0,230,118,0.07);
+  --sell-bg:  rgba(255,61,87,0.07);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'IBM Plex Mono',monospace;
+  font-size:13px;
+  min-height:100vh;
+}
+
+/* ── GRID BG ── */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(64,180,245,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(64,180,245,.025) 1px,transparent 1px);
+  background-size:48px 48px;
+  pointer-events:none;z-index:0;
+}
+
+.wrap{max-width:1280px;margin:0 auto;padding:0 20px 60px;position:relative;z-index:1}
+
+/* ── HEADER ── */
+.hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 0 16px;
+  border-bottom:1px solid var(--border);
+  flex-wrap:wrap;gap:10px;
+}
+.hdr-brand{display:flex;align-items:center;gap:12px}
+.brand-text{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;letter-spacing:-.3px}
+.brand-text em{color:var(--neutral);font-style:normal}
+.hdr-meta{font-size:10px;color:var(--muted);letter-spacing:1.5px}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--buy);box-shadow:0 0 8px var(--buy);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+.hdr-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#clock{font-size:11px;color:var(--muted);letter-spacing:1px}
+
+/* ── BUTTONS ── */
+.btn{
+  background:var(--neutral);color:var(--bg);
+  border:none;padding:7px 18px;
+  font-family:'IBM Plex Mono',monospace;font-size:10px;
+  letter-spacing:2px;text-transform:uppercase;
+  cursor:pointer;font-weight:500;transition:opacity .2s;
+}
+.btn:hover{opacity:.8}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn-ghost{
+  background:transparent;border:1px solid var(--border);
+  color:var(--muted);padding:6px 14px;
+  font-family:'IBM Plex Mono',monospace;font-size:10px;
+  letter-spacing:2px;text-transform:uppercase;cursor:pointer;
+  transition:all .2s;
+}
+.btn-ghost:hover{border-color:var(--ink);color:var(--ink)}
+
+/* ── CCL BAR ── */
+.ccl-bar{
+  background:var(--s1);border:1px solid var(--border);
+  border-left:3px solid var(--neutral);
+  padding:14px 20px;margin:18px 0;
+  display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+}
+.ccl-bar-label{font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;white-space:nowrap}
+.ccl-metrics{display:flex;gap:24px;flex-wrap:wrap;flex:1}
+.ccl-m{display:flex;flex-direction:column;gap:3px}
+.ccl-m .ml{font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
+.ccl-m .mv{font-size:18px;font-weight:500;color:var(--gold)}
+.ccl-m .mv.ok{color:var(--buy)}
+.ccl-m .mv.sm{font-size:13px;color:var(--neutral)}
+
+/* ── STATUS ── */
+.status-bar{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;margin-bottom:6px;
+  font-size:11px;letter-spacing:1px;
+  border:1px solid var(--border);background:var(--s1);
+}
+.status-bar .si{color:var(--muted)}
+.status-bar.loading .si{color:var(--gold);animation:blink 1s infinite}
+.status-bar.ok .si{color:var(--buy)}
+.status-bar.error .si{color:var(--sell)}
+
+/* ── SPLIT PANEL ── */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+
+.panel{border:1px solid var(--border);overflow:hidden}
+
+.panel-hdr{
+  padding:12px 16px;
+  display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid var(--border);
+}
+.panel-hdr.cheap{background:var(--buy-bg);border-bottom-color:rgba(0,230,118,.15)}
+.panel-hdr.expensive{background:var(--sell-bg);border-bottom-color:rgba(255,61,87,.15)}
+
+.panel-hdr h3{font-family:'Syne',sans-serif;font-size:13px;font-weight:800;letter-spacing:.5px}
+.panel-hdr.cheap h3{color:var(--buy)}
+.panel-hdr.expensive h3{color:var(--sell)}
+.panel-hdr .ph-sub{font-size:9px;color:var(--muted);letter-spacing:1px;margin-left:auto;text-transform:uppercase}
+
+/* ── CEDEAR ROW ── */
+.cedear-list{display:flex;flex-direction:column}
+.cedear-row{
+  display:grid;
+  grid-template-columns:44px 1fr 90px 78px 68px 52px;
+  align-items:center;
+  gap:0;
+  padding:10px 16px;
+  border-bottom:1px solid rgba(31,40,64,.6);
+  transition:background .15s;
+  cursor:default;
+}
+.cedear-row:last-child{border-bottom:none}
+.cedear-row:hover{background:rgba(255,255,255,.025)}
+
+.cr-rank{
+  font-size:10px;color:var(--dim);
+  display:flex;align-items:center;justify-content:center;
+}
+.cr-info{display:flex;flex-direction:column;gap:2px}
+.cr-ticker{font-size:13px;font-weight:500;color:var(--ink)}
+.cr-name{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+
+.cr-ccl{font-size:12px;color:var(--neutral);text-align:right}
+.cr-arsval{font-size:11px;color:var(--muted);text-align:right}
+
+.cr-diff{text-align:right}
+.diff-pill{
+  display:inline-block;padding:3px 7px;
+  font-size:11px;font-weight:500;
+}
+.diff-pill.cheap{background:var(--buy-bg);color:var(--buy)}
+.diff-pill.expensive{background:var(--sell-bg);color:var(--sell)}
+.diff-pill.neutral{background:rgba(64,180,245,.08);color:var(--neutral)}
+
+.cr-bar{display:flex;align-items:center;justify-content:flex-end}
+.bar-wrap{width:44px;height:4px;background:var(--s3);overflow:hidden}
+.bar-fill{height:100%;transition:width .5s}
+.bar-fill.cheap{background:var(--buy)}
+.bar-fill.expensive{background:var(--sell)}
+
+.empty-msg{
+  padding:32px;text-align:center;color:var(--muted);
+  font-size:11px;letter-spacing:1px;
+}
+
+/* ── TABLA HEADERS ── */
+.table-hdr{
+  display:grid;
+  grid-template-columns:44px 1fr 90px 78px 68px 52px;
+  gap:0;padding:8px 16px;
+  background:var(--s2);border-bottom:1px solid var(--border);
+}
+.table-hdr span{
+  font-size:9px;letter-spacing:2px;color:var(--muted);
+  text-transform:uppercase;
+}
+.table-hdr span:not(:first-child){text-align:right}
+
+/* ── CCL DETAIL ── */
+.ccl-detail-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin:18px 0 0;
+}
+.cd-box{background:var(--s1);border:1px solid var(--border);padding:14px 16px}
+.cd-box .cl{font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:5px}
+.cd-box .cv{font-size:17px;color:var(--ink)}
+.cd-box .cv.gold{color:var(--gold)}
+.cd-box .cv.buy{color:var(--buy)}
+.cd-box .cv.sell{color:var(--sell)}
+.cd-box .cv.neu{color:var(--neutral)}
+
+/* ── HISTORIAL ── */
+.hist-section{margin-top:28px}
+.sec-hdr{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:10px;
+}
+.sec-hdr h2{font-family:'Syne',sans-serif;font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
+.sec-line{flex:1;height:1px;background:var(--border)}
+
+.hist-filters{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.filter-btn{
+  background:var(--s2);border:1px solid var(--border);
+  color:var(--muted);padding:5px 12px;
+  font-family:'IBM Plex Mono',monospace;font-size:10px;
+  letter-spacing:1px;cursor:pointer;transition:all .15s;
+}
+.filter-btn.active{background:var(--s3);border-color:var(--neutral);color:var(--neutral)}
+.filter-btn:hover{border-color:var(--muted);color:var(--ink)}
+
+.hist-table{width:100%;border-collapse:collapse}
+.hist-table th{
+  padding:8px 12px;text-align:left;
+  font-size:9px;letter-spacing:2px;color:var(--muted);
+  text-transform:uppercase;background:var(--s2);
+  border-bottom:1px solid var(--border);
+}
+.hist-table td{
+  padding:9px 12px;border-bottom:1px solid rgba(31,40,64,.5);
+  font-size:11px;vertical-align:middle;
+}
+.hist-table tr:hover td{background:rgba(255,255,255,.02)}
+.hist-table .td-t{color:var(--ink);font-weight:500}
+.hist-table .td-b{color:var(--buy)}
+.hist-table .td-s{color:var(--sell)}
+.hist-table .td-n{color:var(--neutral)}
+.hist-table .td-m{color:var(--muted)}
+
+/* ── SKELETON ── */
+.skel{
+  background:linear-gradient(90deg,var(--s2) 25%,var(--s3) 50%,var(--s2) 75%);
+  background-size:200% 100%;
+  animation:shimmer 1.4s infinite;
+  height:14px;border-radius:0;
+}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:20px;right:20px;
+  background:var(--gold);color:var(--bg);
+  padding:10px 18px;font-size:11px;letter-spacing:1px;
+  z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.toast.show{opacity:1}
+
+/* ── SAVE BAR ── */
+.save-bar{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 16px;background:var(--s1);
+  border:1px solid var(--border);margin-top:10px;
+  flex-wrap:wrap;
+}
+.save-bar span{font-size:10px;color:var(--muted);letter-spacing:1px;flex:1}
+
+/* ── NOTE BOX ── */
+.note{
+  background:rgba(240,176,64,.07);
+  border:1px solid rgba(240,176,64,.2);
+  padding:12px 16px;margin:14px 0;
+  font-size:11px;color:rgba(240,176,64,.8);
+  line-height:1.7;
+}
+
+@media(max-width:720px){
+  .split{grid-template-columns:1fr}
+  .ccl-detail-grid{grid-template-columns:1fr 1fr}
+  .cedear-row{grid-template-columns:36px 1fr 80px 64px 56px}
+  .table-hdr{grid-template-columns:36px 1fr 80px 64px 56px}
+  .cr-bar{display:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-brand">
+    <div class="pulse"></div>
+    <div>
+      <div class="brand-text">CEDEAR <em>·</em> CCL MONITOR</div>
+      <div class="hdr-meta">BYMA · CIERRE 17:00hs · AL30/AL30C</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <span id="clock">—</span>
+    <button class="btn" id="btnFetch" onclick="fetchTodo()">▶ ACTUALIZAR</button>
+    <button class="btn-ghost" onclick="guardarDia()">+ GUARDAR DÍA</button>
+    <button class="btn-ghost" onclick="exportCSV()">↓ CSV</button>
+  </div>
+</div>
+
+<!-- NOTE -->
+<div class="note">
+  ⚡ Los datos se obtienen de <strong>open.bymadata.com.ar</strong> (API pública BYMA, ~20 min delay durante rueda / precio último al cierre).
+  El CCL se calcula como <strong>AL30 ARS ÷ AL30C USD</strong>. Los precios en USD de los subyacentes los ingresás manualmente (Nasdaq/NYSE).
+  Presioná <strong>ACTUALIZAR</strong> para traer los precios al cierre.
+</div>
+
+<!-- STATUS -->
+<div class="status-bar" id="statusBar">
+  <span class="si" id="statusIcon">◉</span>
+  <span id="statusMsg">Listo · Presioná ACTUALIZAR para traer precios BYMA</span>
+</div>
+
+<!-- CCL BAR -->
+<div class="ccl-bar">
+  <span class="ccl-bar-label">CCL del día</span>
+  <div class="ccl-metrics">
+    <div class="ccl-m">
+      <span class="ml">AL30 (ARS)</span>
+      <span class="mv" id="al30ars">—</span>
+    </div>
+    <div class="ccl-m">
+      <span class="ml">AL30C (USD)</span>
+      <span class="mv" id="al30usd">—</span>
+    </div>
+    <div class="ccl-m">
+      <span class="ml">CCL Calculado</span>
+      <span class="mv gold" id="cclCalc">—</span>
+    </div>
+    <div class="ccl-m">
+      <span class="ml">Tolerancia ±%</span>
+      <span class="mv sm">
+        <input type="number" id="tolerancia" value="3" min="1" max="10" step="0.5"
+          style="background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--neutral);font-family:inherit;font-size:13px;width:42px;outline:none;padding:0 2px;text-align:center">%
+      </span>
+    </div>
+  </div>
+  <div style="font-size:10px;color:var(--muted);letter-spacing:1px" id="lastUpdate">Sin datos</div>
+</div>
+
+<!-- CCL DETAIL -->
+<div class="ccl-detail-grid" id="cclDetail" style="display:none">
+  <div class="cd-box"><div class="cl">CCL Promedio implícito</div><div class="cv gold" id="cd-avg">—</div></div>
+  <div class="cd-box"><div class="cl">Mejor oportunidad</div><div class="cv buy" id="cd-best">—</div></div>
+  <div class="cd-box"><div class="cl">CEDEARs baratos</div><div class="cv buy" id="cd-baratos">—</div></div>
+  <div class="cd-box"><div class="cl">CEDEARs caros</div><div class="cv sell" id="cd-caros">—</div></div>
+</div>
+
+<!-- SPLIT: BARATOS / CAROS -->
+<div class="split" id="splitPanel" style="display:none">
+
+  <div class="panel">
+    <div class="panel-hdr cheap">
+      <h3>↓ BARATOS EN USD</h3>
+      <span class="ph-sub">CCL implícito &lt; CCL ref · Comprar</span>
+    </div>
+    <div class="table-hdr">
+      <span>#</span><span>Ticker</span><span>CCL impl.</span><span>Precio ARS</span><span>Dif %</span><span></span>
+    </div>
+    <div class="cedear-list" id="cheapList"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-hdr expensive">
+      <h3>↑ CAROS EN USD</h3>
+      <span class="ph-sub">CCL implícito &gt; CCL ref · Reducir</span>
+    </div>
+    <div class="table-hdr">
+      <span>#</span><span>Ticker</span><span>CCL impl.</span><span>Precio ARS</span><span>Dif %</span><span></span>
+    </div>
+    <div class="cedear-list" id="expList"></div>
+  </div>
+
+</div>
+
+<!-- USD MANUAL INPUTS -->
+<div id="usdInputSection" style="margin-top:18px">
+  <div class="sec-hdr">
+    <h2>Precios USD subyacente (origen)</h2>
+    <div class="sec-line"></div>
+    <span style="font-size:9px;color:var(--muted);letter-spacing:1px;white-space:nowrap">Nasdaq / NYSE — ingresar al cierre</span>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:4px" id="usdGrid"></div>
+  <div style="margin-top:8px;display:flex;gap:8px">
+    <button class="btn" onclick="recalcularConUSD()">↺ RECALCULAR CON USD</button>
+  </div>
+</div>
+
+<!-- HISTORIAL -->
+<div class="hist-section">
+  <div class="sec-hdr">
+    <h2>Registro histórico</h2>
+    <div class="sec-line"></div>
+  </div>
+  <div class="hist-filters">
+    <button class="filter-btn active" onclick="filtrarHist('todos',this)">TODOS</button>
+    <button class="filter-btn" onclick="filtrarHist('BARATO',this)">BARATOS</button>
+    <button class="filter-btn" onclick="filtrarHist('CARO',this)">CAROS</button>
+    <button class="filter-btn" onclick="filtrarHist('NEUTRO',this)">NEUTROS</button>
+    <button class="btn-ghost" onclick="borrarHistorial()" style="margin-left:auto;color:rgba(255,61,87,.5);border-color:rgba(255,61,87,.15)">✕ Borrar</button>
+  </div>
+  <div id="histContainer">
+    <div class="empty-msg" id="histEmpty">Sin registros. Presioná "+ GUARDAR DÍA" después de actualizar.</div>
+    <table class="hist-table" id="histTable" style="display:none">
+      <thead>
+        <tr>
+          <th>Fecha</th><th>CCL Ref</th><th>Ticker</th>
+          <th>CCL Impl</th><th>Dif %</th><th>Estado</th>
+          <th>Precio ARS</th><th>Precio USD</th>
+        </tr>
+      </thead>
+      <tbody id="histBody"></tbody>
+    </table>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════
+//  CONFIGURACIÓN — Top 10 CEDEARs más operados
+// ════════════════════════════════════════════════
+const CEDEARS = [
+  { ticker:'AAPL',  name:'Apple Inc.',         ratio:20,  flag:'🍎', usdDefault:195  },
+  { ticker:'NVDA',  name:'Nvidia Corp.',        ratio:10,  flag:'💚', usdDefault:870  },
+  { ticker:'AMZN',  name:'Amazon.com',          ratio:144, flag:'📦', usdDefault:179  },
+  { ticker:'GOOGL', name:'Alphabet (Google)',   ratio:32,  flag:'🔵', usdDefault:168  },
+  { ticker:'MSFT',  name:'Microsoft Corp.',     ratio:30,  flag:'🪟', usdDefault:420  },
+  { ticker:'SPY',   name:'SPDR S&P 500 ETF',   ratio:25,  flag:'📊', usdDefault:565  },
+  { ticker:'MELI',  name:'MercadoLibre',        ratio:120, flag:'🛒', usdDefault:2100 },
+  { ticker:'TSLA',  name:'Tesla Inc.',          ratio:15,  flag:'⚡', usdDefault:240  },
+  // Petrobras: PBR (ADR en NYSE), PBR cedear, PETR3 cedear brasilero
+  { ticker:'PBR',   name:'Petrobras ADR (NYSE)',ratio:6,   flag:'🛢️', usdDefault:16,  bymaKey:'PBR' },
+  { ticker:'PETR3', name:'Petrobras BR (BCBA)', ratio:2,   flag:'🛢️', usdDefault:38,  bymaKey:'PETR3', usdMarket:'BOVESPA·BRL' },
+  { ticker:'VALE',  name:'Vale S.A.',           ratio:4,   flag:'⛏️', usdDefault:11   },
+];
+
+// Estado global
+let state = {
+  ccl: null,
+  al30ars: null,
+  al30usd: null,
+  arsPrecios: {},   // ticker → precio ARS desde BYMA
+  usdPrecios: {},   // ticker → precio USD ingresado manualmente
+  resultados: [],
+  filtroHist: 'todos',
+};
+
+let historial = JSON.parse(localStorage.getItem('cedear_hist_v2') || '[]');
+
+// ─── RELOJ ────────────────────────────────────
+function tick() {
+  const n = new Date();
+  document.getElementById('clock').textContent =
+    n.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'}) + '  ' +
+    n.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+setInterval(tick, 1000); tick();
+
+// ─── USD INPUTS ───────────────────────────────
+function buildUSDInputs() {
+  const grid = document.getElementById('usdGrid');
+  grid.innerHTML = CEDEARS.map((c,i) => `
+    <div style="background:var(--s1);border:1px solid var(--border);padding:12px 14px">
+      <div style="font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:6px">
+        ${c.flag} ${c.ticker} ${c.usdMarket ? '('+c.usdMarket+')' : '(USD)'}
+      </div>
+      <input type="number" id="usd_${i}" value="${c.usdDefault}" step="0.5"
+        style="background:transparent;border:none;border-bottom:1px solid var(--border);
+          color:var(--ink);font-family:inherit;font-size:16px;width:100%;outline:none;padding:2px 0"
+        placeholder="precio USD">
+    </div>
+  `).join('');
+}
+
+// ─── STATUS HELPER ────────────────────────────
+function setStatus(type, msg) {
+  const bar = document.getElementById('statusBar');
+  const icon = document.getElementById('statusIcon');
+  const text = document.getElementById('statusMsg');
+  bar.className = 'status-bar ' + type;
+  icon.textContent = type === 'loading' ? '◌' : type === 'ok' ? '◉' : '◈';
+  text.textContent = msg;
+}
+
+// ─── TOAST ────────────────────────────────────
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ─── FETCH DESDE OPEN BYMADATA ────────────────
+const BASE = 'https://open.bymadata.com.ar/vanoms-be-core/rest/api/bymadata/free/';
+
+async function fetchBYMA(endpoint) {
+  const r = await fetch(BASE + endpoint, {
+    headers: { 'Accept': 'application/json' }
+  });
+  if (!r.ok) throw new Error(`HTTP ${r.status} en ${endpoint}`);
+  return r.json();
+}
+
+async function fetchTodo() {
+  const btn = document.getElementById('btnFetch');
+  btn.disabled = true;
+  setStatus('loading', 'Conectando con open.bymadata.com.ar…');
+
+  try {
+    // 1 — Traer todos los CEDEARs (incluye PBR, PETR3, etc.)
+    setStatus('loading', 'Cargando CEDEARs desde BYMA…');
+    const cedearData = await fetchBYMA('bnown-cedears');
+
+    // Mapear: { ticker: lastPrice }
+    const arsMap = {};
+    if (cedearData && cedearData.data) {
+      cedearData.data.forEach(d => {
+        const sym = (d.symbol || d.ticker || '').toUpperCase().trim();
+        const price = d.last || d.trade || d.close || 0;
+        if (sym && price) arsMap[sym] = price;
+      });
+    }
+    state.arsPrecios = arsMap;
+
+    // 2 — Traer bonos para AL30 y AL30C (CCL)
+    setStatus('loading', 'Calculando CCL desde AL30 / AL30C…');
+    const bonosData = await fetchBYMA('government-securities');
+    let al30ars = null, al30usd = null;
+
+    if (bonosData && bonosData.data) {
+      bonosData.data.forEach(d => {
+        const sym = (d.symbol || d.ticker || '').toUpperCase().trim();
+        const price = d.last || d.trade || d.close || 0;
+        if (!price) return;
+        if (sym === 'AL30')  al30ars = price;
+        if (sym === 'AL30C') al30usd = price;
+      });
+    }
+
+    state.al30ars = al30ars;
+    state.al30usd = al30usd;
+
+    if (al30ars && al30usd) {
+      state.ccl = al30ars / al30usd;
+    } else {
+      // Fallback: buscar en leading-equity
+      setStatus('loading', 'Buscando AL30 en panel general…');
+      try {
+        const eq = await fetchBYMA('bnown-equity');
+        if (eq && eq.data) {
+          eq.data.forEach(d => {
+            const sym = (d.symbol || d.ticker || '').toUpperCase().trim();
+            const price = d.last || d.trade || d.close || 0;
+            if (!price) return;
+            if (sym === 'AL30')  al30ars = al30ars || price;
+            if (sym === 'AL30C') al30usd = al30usd || price;
+          });
+        }
+        state.al30ars = al30ars;
+        state.al30usd = al30usd;
+        if (al30ars && al30usd) state.ccl = al30ars / al30usd;
+      } catch(e) {}
+    }
+
+    // Actualizar UI del CCL
+    document.getElementById('al30ars').textContent =
+      al30ars ? '$' + al30ars.toLocaleString('es-AR', {maximumFractionDigits:2}) : 'N/D';
+    document.getElementById('al30usd').textContent =
+      al30usd ? 'u$s ' + al30usd.toLocaleString('es-AR', {maximumFractionDigits:2}) : 'N/D';
+    document.getElementById('cclCalc').textContent =
+      state.ccl ? '$' + Math.round(state.ccl).toLocaleString('es-AR') : 'N/D';
+
+    const now = new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+    document.getElementById('lastUpdate').textContent = 'Actualizado ' + now + 'hs';
+
+    // Cargar USD actuales del input
+    CEDEARS.forEach((c,i) => {
+      const v = parseFloat(document.getElementById('usd_'+i).value);
+      if (v) state.usdPrecios[c.ticker] = v;
+    });
+
+    // Calcular y renderizar
+    calcularYRenderizar();
+
+    const found = Object.keys(arsMap).length;
+    setStatus('ok', `Datos OK · ${found} CEDEARs recibidos · CCL: $${state.ccl ? Math.round(state.ccl).toLocaleString('es-AR') : 'N/D'}`);
+    toast('Datos actualizados desde BYMA');
+
+  } catch(err) {
+    setStatus('error', 'Error al conectar con BYMA: ' + err.message + ' — Verificá tu conexión o intentá de nuevo');
+    toast('Error: ' + err.message);
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ─── RECALCULAR CON USD MANUAL ─────────────────
+function recalcularConUSD() {
+  CEDEARS.forEach((c,i) => {
+    const v = parseFloat(document.getElementById('usd_'+i).value);
+    if (v) state.usdPrecios[c.ticker] = v;
+  });
+  calcularYRenderizar();
+  toast('Recalculado con precios USD actualizados');
+}
+
+// ─── CALCULAR Y RENDERIZAR ─────────────────────
+function calcularYRenderizar() {
+  const ccl = state.ccl;
+  const tol = parseFloat(document.getElementById('tolerancia').value) || 3;
+
+  if (!ccl) {
+    setStatus('error', 'Sin CCL. Actualizá primero o revisá AL30/AL30C.');
+    return;
+  }
+
+  state.resultados = CEDEARS.map(c => {
+    // Precio ARS: buscar por ticker o bymaKey
+    const key = c.bymaKey || c.ticker;
+    let arsPrice = state.arsPrecios[key] || state.arsPrecios[c.ticker] || null;
+
+    // Precio USD
+    const usdPrice = state.usdPrecios[c.ticker] || c.usdDefault;
+
+    if (!arsPrice || !usdPrice) return { ...c, arsPrice, usdPrice, cclImpl: null, difPct: null };
+
+    // CCL implícito = (precio ARS × ratio) / precio USD
+    const cclImpl = (arsPrice * c.ratio) / usdPrice;
+    const difPct = ((cclImpl - ccl) / ccl) * 100;
+
+    return { ...c, arsPrice, usdPrice, cclImpl, difPct };
+  }).filter(r => r.cclImpl !== null);
+
+  // Separar
+  const baratos = state.resultados
+    .filter(r => r.difPct < -tol)
+    .sort((a,b) => a.difPct - b.difPct);
+
+  const caros = state.resultados
+    .filter(r => r.difPct > tol)
+    .sort((a,b) => b.difPct - a.difPct);
+
+  const neutros = state.resultados.filter(r => Math.abs(r.difPct) <= tol);
+
+  // Render listas
+  renderLista('cheapList', baratos, 'cheap');
+  renderLista('expList',   caros,   'expensive');
+
+  // Summary
+  const avg = state.resultados.reduce((s,r) => s + r.cclImpl, 0) / state.resultados.length;
+  document.getElementById('cd-avg').textContent    = '$' + Math.round(avg).toLocaleString('es-AR');
+  document.getElementById('cd-best').textContent   = baratos.length > 0 ? baratos[0].flag + ' ' + baratos[0].ticker : '—';
+  document.getElementById('cd-baratos').textContent = baratos.length;
+  document.getElementById('cd-caros').textContent   = caros.length;
+
+  document.getElementById('cclDetail').style.display = 'grid';
+  document.getElementById('splitPanel').style.display = 'grid';
+}
+
+function renderLista(containerId, items, type) {
+  const el = document.getElementById(containerId);
+  if (items.length === 0) {
+    el.innerHTML = `<div class="empty-msg">Sin CEDEARs ${type === 'cheap' ? 'baratos' : 'caros'} con tolerancia actual</div>`;
+    return;
+  }
+
+  const maxAbs = Math.max(...items.map(r => Math.abs(r.difPct)));
+
+  el.innerHTML = items.map((r,i) => {
+    const barW = maxAbs > 0 ? (Math.abs(r.difPct) / maxAbs * 100).toFixed(0) : 0;
+    const sign = r.difPct > 0 ? '+' : '';
+    return `
+    <div class="cedear-row">
+      <div class="cr-rank">${i+1}</div>
+      <div class="cr-info">
+        <span class="cr-ticker">${r.flag} ${r.ticker}</span>
+        <span class="cr-name">${r.name}</span>
+      </div>
+      <div class="cr-ccl">$${Math.round(r.cclImpl).toLocaleString('es-AR')}</div>
+      <div class="cr-arsval">$${r.arsPrice ? Math.round(r.arsPrice).toLocaleString('es-AR') : '—'}</div>
+      <div class="cr-diff">
+        <span class="diff-pill ${type}">${sign}${r.difPct.toFixed(1)}%</span>
+      </div>
+      <div class="cr-bar">
+        <div class="bar-wrap"><div class="bar-fill ${type}" style="width:${barW}%"></div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── GUARDAR DÍA ──────────────────────────────
+function guardarDia() {
+  if (state.resultados.length === 0) { toast('Actualizá primero'); return; }
+
+  const fecha = new Date().toLocaleDateString('es-AR', {day:'2-digit',month:'2-digit',year:'numeric'});
+  const tol = parseFloat(document.getElementById('tolerancia').value) || 3;
+
+  state.resultados.forEach(r => {
+    const estado = r.difPct < -tol ? 'BARATO' : r.difPct > tol ? 'CARO' : 'NEUTRO';
+    historial.unshift({
+      fecha,
+      cclRef: Math.round(state.ccl),
+      ticker: r.ticker,
+      cclImpl: Math.round(r.cclImpl),
+      difPct: r.difPct.toFixed(1),
+      estado,
+      arsPrice: r.arsPrice ? Math.round(r.arsPrice) : '—',
+      usdPrice: r.usdPrice || '—',
+    });
+  });
+
+  historial = historial.slice(0, 1000);
+  localStorage.setItem('cedear_hist_v2', JSON.stringify(historial));
+  renderHistorial();
+  toast(`Guardado · ${fecha} · ${state.resultados.length} activos`);
+}
+
+// ─── RENDER HISTORIAL ─────────────────────────
+function filtrarHist(tipo, el) {
+  state.filtroHist = tipo;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderHistorial();
+}
+
+function renderHistorial() {
+  const datos = state.filtroHist === 'todos'
+    ? historial
+    : historial.filter(r => r.estado === state.filtroHist);
+
+  if (datos.length === 0) {
+    document.getElementById('histEmpty').style.display = 'block';
+    document.getElementById('histTable').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('histEmpty').style.display = 'none';
+  document.getElementById('histTable').style.display = 'table';
+
+  document.getElementById('histBody').innerHTML = datos.slice(0, 150).map(r => {
+    const cls = r.estado === 'BARATO' ? 'td-b' : r.estado === 'CARO' ? 'td-s' : 'td-n';
+    const sign = parseFloat(r.difPct) > 0 ? '+' : '';
+    return `
+    <tr>
+      <td class="td-m">${r.fecha}</td>
+      <td class="td-m">$${Number(r.cclRef).toLocaleString('es-AR')}</td>
+      <td class="td-t">${r.ticker}</td>
+      <td class="td-n">$${Number(r.cclImpl).toLocaleString('es-AR')}</td>
+      <td class="${cls}">${sign}${r.difPct}%</td>
+      <td class="${cls}" style="font-size:10px;letter-spacing:1px">${r.estado}</td>
+      <td class="td-m">$${r.arsPrice}</td>
+      <td class="td-m">$${r.usdPrice}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ─── EXPORT CSV ───────────────────────────────
+function exportCSV() {
+  if (historial.length === 0) { toast('Sin datos para exportar'); return; }
+  const rows = [
+    ['Fecha','CCL Ref','Ticker','CCL Impl','Dif %','Estado','Precio ARS','Precio USD'],
+    ...historial.map(r => [r.fecha,r.cclRef,r.ticker,r.cclImpl,r.difPct,r.estado,r.arsPrice,r.usdPrice])
+  ];
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download = `cedear_ccl_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  toast('CSV exportado');
+}
+
+// ─── BORRAR HISTORIAL ─────────────────────────
+function borrarHistorial() {
+  if (!confirm('¿Borrar todo el historial?')) return;
+  historial = [];
+  localStorage.removeItem('cedear_hist_v2');
+  renderHistorial();
+  toast('Historial borrado');
+}
+
+// ─── INIT ─────────────────────────────────────
+buildUSDInputs();
+renderHistorial();
+</script>
+</body>
+</html>

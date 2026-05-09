@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ratio CEDEAR / Local — BYMA</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@300;400;500&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f0e8;
+  --bg2: #ede8dc;
+  --ink: #1a1612;
+  --ink2: #3d3830;
+  --muted: #8a7f72;
+  --border: #d4ccbc;
+  --accent: #c0392b;
+  --accent2: #2980b9;
+  --accent3: #27ae60;
+  --gold: #d4821a;
+  --surface: #ffffff;
+  --surface2: #f0ebe0;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Lora', serif;
+  line-height: 1.7;
+}
+
+/* GRAIN TEXTURE */
+body::after {
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events:none;
+  z-index:999;
+  opacity:0.4;
+}
+
+.container { max-width:1080px; margin:0 auto; padding:0 28px; }
+
+/* HEADER */
+header {
+  background: var(--ink);
+  color: var(--bg);
+  padding: 56px 0 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+header::before {
+  content: 'RATIO';
+  position: absolute;
+  right: -20px;
+  top: -20px;
+  font-family: 'Syne', sans-serif;
+  font-size: 200px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.03);
+  line-height: 1;
+  pointer-events: none;
+}
+
+.header-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+header h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(32px, 6vw, 64px);
+  font-weight: 800;
+  line-height: 1.0;
+  letter-spacing: -1px;
+  margin-bottom: 8px;
+}
+
+header h1 .red { color: var(--accent); }
+header h1 .blue { color: #5dade2; }
+
+.header-sub {
+  font-size: 15px;
+  color: rgba(245,240,232,0.55);
+  font-style: italic;
+  max-width: 560px;
+  margin-top: 12px;
+}
+
+/* ALERT BOX */
+.alert {
+  background: var(--surface);
+  border: 2px solid var(--gold);
+  border-left: 6px solid var(--gold);
+  padding: 20px 24px;
+  margin: 32px 0;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.alert .icon { font-size: 22px; flex-shrink:0; margin-top: 2px; }
+.alert .body { font-size: 14px; }
+.alert .body strong { font-family: 'Syne', sans-serif; display: block; margin-bottom: 4px; font-size: 15px; }
+.alert.danger { border-color: var(--accent); }
+.alert.info { border-color: var(--accent2); }
+.alert.ok { border-color: var(--accent3); }
+
+/* SECTIONS */
+section { padding: 60px 0; border-bottom: 1px solid var(--border); }
+
+h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+
+.sec-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+p { color: var(--ink2); margin-bottom: 14px; font-size: 15px; }
+
+/* FORMULA */
+.formula {
+  background: var(--ink);
+  color: var(--bg);
+  padding: 24px 28px;
+  margin: 24px 0;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.formula .flabel {
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.formula .feq {
+  font-size: 18px;
+  color: #f5f0e8;
+}
+
+.formula .feq .hi { color: var(--gold); }
+.formula .feq .red { color: #e74c3c; }
+.formula .feq .blue { color: #5dade2; }
+.formula .fdesc {
+  font-size: 12px;
+  color: rgba(245,240,232,0.5);
+  margin-top: 10px;
+  font-family: 'Lora', serif;
+  font-style: italic;
+  line-height: 1.6;
+}
+
+/* TWO COLUMN */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 24px; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 24px;
+}
+
+.card h4 {
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.card p, .card li { font-size: 13px; color: var(--muted); }
+.card ul { list-style: none; }
+.card ul li { padding: 5px 0; border-bottom: 1px solid var(--border); display: flex; gap: 8px; }
+.card ul li::before { content: '→'; color: var(--accent); flex-shrink:0; }
+
+/* STEP FLOW */
+.flow {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 28px;
+}
+
+.flow-step {
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  align-items: stretch;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.15s;
+}
+
+.flow-step:hover { border-color: var(--ink); transform: translateX(4px); }
+
+.flow-n {
+  background: var(--ink);
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.flow-body { padding: 18px 22px; }
+.flow-body h4 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.flow-body p { font-size: 13px; color: var(--muted); margin: 0; }
+
+.flow-tag {
+  padding: 18px 16px;
+  display: flex;
+  align-items: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  border-left: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+/* DECISION TABLE */
+.decision-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 24px;
+  font-size: 14px;
+}
+
+.decision-table th {
+  background: var(--ink);
+  color: var(--bg);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 12px 16px;
+  text-align: left;
+}
+
+.decision-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.decision-table tr:nth-child(even) td { background: var(--surface2); }
+.decision-table tr:hover td { background: var(--bg2); }
+
+.badge {
+  display: inline-block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  padding: 3px 8px;
+  border-radius: 2px;
+}
+
+.badge.buy { background: #d5f5e3; color: #1a7a45; }
+.badge.sell { background: #fadbd8; color: #922b21; }
+.badge.hold { background: #fef9e7; color: #9a7d0a; }
+.badge.rotate { background: #d6eaf8; color: #1a5276; }
+
+/* SIMULATOR */
+.sim-wrap {
+  background: var(--ink);
+  color: var(--bg);
+  padding: 32px;
+  margin-top: 32px;
+}
+
+.sim-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.input-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.igroup label {
+  display: block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: rgba(245,240,232,0.45);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.igroup input {
+  width: 100%;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--bg);
+  padding: 10px 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.igroup input:focus { border-color: var(--gold); }
+
+.igroup .unit {
+  font-size: 10px;
+  color: rgba(245,240,232,0.3);
+  margin-top: 4px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+/* RESULT PANEL */
+.result-panel {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 24px;
+  margin-top: 4px;
+}
+
+.result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+
+.res-metric { padding: 16px 18px; background: rgba(0,0,0,0.2); }
+.res-metric .rl { font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:2px; color:rgba(245,240,232,0.4); margin-bottom:6px; text-transform:uppercase; }
+.res-metric .rv { font-family:'IBM Plex Mono',monospace; font-size:22px; }
+.res-metric .rv.up { color: #52d68a; }
+.res-metric .rv.down { color: #e74c3c; }
+.res-metric .rv.neu { color: var(--gold); }
+
+.signal-banner {
+  margin-top: 16px;
+  padding: 18px 22px;
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.signal-banner.comprar-cedear { background: #1a7a45; color: #d5f5e3; }
+.signal-banner.comprar-local { background: #1a5276; color: #d6eaf8; }
+.signal-banner.rotar { background: #7d6608; color: #fef9e7; }
+.signal-banner.mantener { background: rgba(255,255,255,0.06); color: rgba(245,240,232,0.6); }
+
+.explanation {
+  margin-top: 12px;
+  font-size: 13px;
+  color: rgba(245,240,232,0.55);
+  font-style: italic;
+  line-height: 1.6;
+}
+
+/* PAIRS GUIDE */
+.pairs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+  margin-top: 24px;
+}
+
+.pair-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pair-card:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.pair-card:hover p { color: rgba(245,240,232,0.55); }
+
+.pair-card .pc-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.pair-card .pc-name .slash { color: var(--muted); }
+.pair-card:hover .pc-name .slash { color: rgba(245,240,232,0.3); }
+
+.pair-card p { font-size: 12px; color: var(--muted); margin: 0; }
+
+.pair-card .pc-corr {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  margin-top: 10px;
+  color: var(--accent3);
+}
+
+.pair-card:hover .pc-corr { color: #52d68a; }
+
+/* CANVAS */
+canvas {
+  width: 100%;
+  display: block;
+  background: var(--ink);
+  margin-top: 16px;
+}
+
+/* CCL EXPLAINER */
+.ccl-flow {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin: 24px 0;
+  flex-wrap: wrap;
+}
+
+.ccl-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 14px 18px;
+  font-size: 13px;
+  text-align: center;
+  flex: 1;
+  min-width: 120px;
+}
+
+.ccl-box .cb-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.ccl-box .cb-val {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.ccl-arrow {
+  font-size: 20px;
+  color: var(--muted);
+  padding: 0 8px;
+  flex-shrink: 0;
+}
+
+/* BUTTON */
+.btn-calc {
+  background: var(--gold);
+  color: var(--ink);
+  border: none;
+  padding: 12px 32px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-top: 16px;
+  transition: opacity 0.2s;
+}
+
+.btn-calc:hover { opacity: 0.85; }
+
+footer {
+  padding: 40px 0;
+  text-align: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 2px;
+}
+
+@media (max-width:640px) {
+  .two-col { grid-template-columns: 1fr; }
+  .input-grid { grid-template-columns: 1fr 1fr; }
+  .result-grid { grid-template-columns: 1fr 1fr; }
+  .pairs-grid { grid-template-columns: 1fr 1fr; }
+  .flow-step { grid-template-columns: 40px 1fr; }
+  .flow-tag { display: none; }
+  .ccl-flow { flex-direction: column; gap: 4px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-tag">BYMA · CEDEARs · Sin Short · Argentina</div>
+    <h1>RATIO <span class="red">CEDEAR</span><br>vs <span class="blue">LOCAL</span></h1>
+    <p class="header-sub">Sistema completo para operar el desarbitraje por CCL entre CEDEARs y acciones locales — sin necesidad de operar en corto.</p>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- CONCEPTO CLAVE -->
+  <section>
+    <div class="sec-num">01 — LA LÓGICA</div>
+    <h2>Por qué existe este desarbitraje</h2>
+
+    <p>En Argentina, el mismo activo cotiza en dos formas distintas: como <strong>acción local en pesos (BYMA)</strong> o como <strong>CEDEAR en pesos (también BYMA)</strong>. El CEDEAR es un recibo que representa acciones del exterior, pero se negocia en pesos al tipo de cambio implícito del mercado (CCL).</p>
+
+    <p>La clave: el precio del CEDEAR en pesos debería ser <em>exactamente igual</em> al precio del subyacente en USD multiplicado por el CCL. Cuando no lo es, existe un <strong>desarbitraje</strong> — y ahí está la oportunidad.</p>
+
+    <div class="formula">
+      <div class="flabel">Precio Teórico del CEDEAR</div>
+      <div class="feq">
+        CEDEAR<span class="hi">(ARS)</span> = Precio<span class="blue">(USD)</span> × CCL × <span class="red">Ratio de conversión</span>
+      </div>
+      <div class="fdesc">
+        Ejemplo MSFT: precio USD 420 × CCL $1.250 × ratio 1 = ARS 525.000 por acción.<br>
+        Si el CEDEAR cotiza a ARS 490.000 → está barato un 6,7% vs su valor teórico.<br>
+        Si cotiza a ARS 560.000 → está caro un 6,7%.
+      </div>
+    </div>
+
+    <div class="ccl-flow">
+      <div class="ccl-box">
+        <div class="cb-label">MSFT NYSE</div>
+        <div class="cb-val">USD 420</div>
+      </div>
+      <div class="ccl-arrow">×</div>
+      <div class="ccl-box">
+        <div class="cb-label">CCL Implícito</div>
+        <div class="cb-val">$1.250</div>
+      </div>
+      <div class="ccl-arrow">=</div>
+      <div class="ccl-box" style="border-color:var(--gold);background:#fef9e7;">
+        <div class="cb-label">Precio Teórico</div>
+        <div class="cb-val" style="color:var(--gold)">ARS 525.000</div>
+      </div>
+      <div class="ccl-arrow">vs</div>
+      <div class="ccl-box" style="border-color:var(--accent2);background:#eaf4fb;">
+        <div class="cb-label">Precio Real CEDEAR</div>
+        <div class="cb-val" style="color:var(--accent2)">ARS 490.000</div>
+      </div>
+      <div class="ccl-arrow">=</div>
+      <div class="ccl-box" style="border-color:var(--accent3);background:#d5f5e3;">
+        <div class="cb-label">Oportunidad</div>
+        <div class="cb-val" style="color:var(--accent3)">−6.7%</div>
+      </div>
+    </div>
+
+    <div class="alert">
+      <div class="icon">🎯</div>
+      <div class="body">
+        <strong>La diferencia entre MSFT y BMA como par</strong>
+        MSFT (CEDEAR) y BMA (local) no están correlacionados por fundamentals — son empresas completamente distintas. Lo que los conecta es el <strong>CCL implícito</strong>: ambos se usan para medir cuánto "dólar" hay en cada precio en pesos. El ratio MSFT(ARS)/BMA(ARS) captura cuándo uno de los dos se está moviendo más rápido que el dólar.
+      </div>
+    </div>
+  </section>
+
+  <!-- DOS ESTRATEGIAS -->
+  <section>
+    <div class="sec-num">02 — LAS DOS ESTRATEGIAS</div>
+    <h2>Qué podés hacer sin short</h2>
+
+    <div class="two-col">
+      <div class="card" style="border-top: 3px solid var(--accent2);">
+        <h4>📐 Estrategia A — Ratio entre CEDEARs y locales</h4>
+        <ul>
+          <li>Calcular el ratio MSFT(ARS) / BMA(ARS) diariamente</li>
+          <li>Cuando el ratio sube mucho → MSFT está caro o BMA está barata → rotás hacia BMA</li>
+          <li>Cuando el ratio baja mucho → MSFT está barata o BMA está cara → rotás hacia MSFT</li>
+          <li>No shorts: simplemente sobreponderas uno y subponderas el otro</li>
+          <li>Funciona aunque no haya correlación directa entre ambas empresas</li>
+        </ul>
+      </div>
+      <div class="card" style="border-top: 3px solid var(--accent3);">
+        <h4>💱 Estrategia B — Desarbitraje CCL del CEDEAR</h4>
+        <ul>
+          <li>Calculás el CCL implícito del CEDEAR (precio ARS / precio USD)</li>
+          <li>Comparás contra el CCL de referencia (GD30, AL30, etc.)</li>
+          <li>Si el CEDEAR cotiza con CCL implícito más bajo → comprás CEDEAR (está barato en dólares)</li>
+          <li>Si cotiza con CCL implícito más alto → evitás o reducís posición</li>
+          <li>Es posicionamiento en dólares a mejor precio que el mercado</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="alert info" style="margin-top:20px;">
+      <div class="icon">💡</div>
+      <div class="body">
+        <strong>Combinación óptima para tu caso</strong>
+        Usás la Estrategia B para detectar si el CEDEAR está barato o caro en dólares, y la Estrategia A para decidir si rotar entre activos. El ratio CEDEAR/local te dice cuándo hacer el movimiento, el CCL implícito te dice hacia dónde.
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESO -->
+  <section>
+    <div class="sec-num">03 — PROCESO OPERATIVO</div>
+    <h2>Cómo operar paso a paso</h2>
+
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-n">01</div>
+        <div class="flow-body">
+          <h4>Registrá precios diariamente</h4>
+          <p>MSFT en pesos (CEDEAR BYMA), BMA en pesos (local BYMA), CCL del día (GD30 o AL30 dividido su precio USD). Anotá al cierre o en un horario fijo cada día.</p>
+        </div>
+        <div class="flow-tag">DATOS</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-n">02</div>
+        <div class="flow-body">
+          <h4>Calculá el Ratio y el CCL implícito</h4>
+          <p>Ratio = MSFT(ARS) / BMA(ARS). CCL implícito MSFT = precio MSFT en ARS / precio MSFT en USD (Nasdaq). Guardá una serie de al menos 30 días.</p>
+        </div>
+        <div class="flow-tag">CÁLCULO</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-n">03</div>
+        <div class="flow-body">
+          <h4>Calculá la media y bandas del ratio</h4>
+          <p>Media móvil de 20 días del ratio. Bandas = Media ± 1 desvío estándar para alerta, ± 2 desvíos para señal fuerte. El Z-Score = (Ratio actual − Media) / Desvío.</p>
+        </div>
+        <div class="flow-tag">ESTADÍSTICA</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-n">04</div>
+        <div class="flow-body">
+          <h4>Interpretá la señal</h4>
+          <p>Z-Score &gt; +1.5: MSFT caro relativo a BMA → reducí MSFT, sumá BMA. Z-Score &lt; −1.5: BMA cara relativa a MSFT → reducí BMA, sumá MSFT. Z-Score entre ±1: no hacés nada.</p>
+        </div>
+        <div class="flow-tag">SEÑAL</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-n">05</div>
+        <div class="flow-body">
+          <h4>Verificá el CCL implícito antes de ejecutar</h4>
+          <p>Antes de comprar el CEDEAR, confirmá que su CCL implícito esté igual o por debajo del CCL de referencia. Si está caro en dólares, esperás a que comprima o buscás otro CEDEAR equivalente.</p>
+        </div>
+        <div class="flow-tag">FILTRO</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-n">06</div>
+        <div class="flow-body">
+          <h4>Ejecutá la rotación</h4>
+          <p>Vendés el activo que está caro relativamente y comprás el que está barato. El tamaño de la rotación es proporcional al Z-Score: a mayor desviación, mayor porcentaje del portafolio que movés (máx. 20-30% por señal).</p>
+        </div>
+        <div class="flow-tag">EJECUCIÓN</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-n">07</div>
+        <div class="flow-body">
+          <h4>Cerrá cuando el ratio vuelve a la media</h4>
+          <p>Cuando el Z-Score vuelve a 0 (ratio en su media histórica), revertís la posición. Si el Z-Score supera ±3, revisás si el par sigue siendo válido o si algo estructural cambió.</p>
+        </div>
+        <div class="flow-tag">SALIDA</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TABLA DE DECISIÓN -->
+  <section>
+    <div class="sec-num">04 — TABLA DE DECISIÓN</div>
+    <h2>Qué hacer según el Z-Score del ratio</h2>
+    <p>Esta tabla te dice exactamente qué acción tomar según la posición del ratio respecto a su media histórica. Aplica para el par MSFT/BMA y cualquier otro par CEDEAR/local.</p>
+
+    <table class="decision-table">
+      <thead>
+        <tr>
+          <th>Z-Score del Ratio</th>
+          <th>Interpretación</th>
+          <th>Acción sobre MSFT (CEDEAR)</th>
+          <th>Acción sobre BMA (local)</th>
+          <th>Señal</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>&gt; +2.0σ</strong></td>
+          <td>MSFT muy caro vs BMA. El ratio está en máximos históricos.</td>
+          <td>Reducí posición fuerte (20-30%)</td>
+          <td>Sumá posición fuerte (20-30%)</td>
+          <td><span class="badge sell">ROTAR → BMA</span></td>
+        </tr>
+        <tr>
+          <td><strong>+1.5 a +2.0σ</strong></td>
+          <td>MSFT caro vs BMA. Señal moderada.</td>
+          <td>Reducí posición leve (10-15%)</td>
+          <td>Sumá posición leve (10-15%)</td>
+          <td><span class="badge rotate">ROTAR leve → BMA</span></td>
+        </tr>
+        <tr>
+          <td><strong>+0.5 a +1.5σ</strong></td>
+          <td>Ratio levemente elevado. Sin señal clara.</td>
+          <td>Mantené</td>
+          <td>Mantené</td>
+          <td><span class="badge hold">MANTENER</span></td>
+        </tr>
+        <tr>
+          <td><strong>−0.5 a +0.5σ</strong></td>
+          <td>Ratio en zona neutral, cerca de la media. Sin señal.</td>
+          <td>Mantené ponderación base</td>
+          <td>Mantené ponderación base</td>
+          <td><span class="badge hold">NEUTRO</span></td>
+        </tr>
+        <tr>
+          <td><strong>−1.5 a −0.5σ</strong></td>
+          <td>Ratio levemente bajo. Sin señal clara.</td>
+          <td>Mantené</td>
+          <td>Mantené</td>
+          <td><span class="badge hold">MANTENER</span></td>
+        </tr>
+        <tr>
+          <td><strong>−1.5 a −2.0σ</strong></td>
+          <td>MSFT barato vs BMA. Señal moderada.</td>
+          <td>Sumá posición leve (10-15%)</td>
+          <td>Reducí posición leve (10-15%)</td>
+          <td><span class="badge rotate">ROTAR leve → MSFT</span></td>
+        </tr>
+        <tr>
+          <td><strong>&lt; −2.0σ</strong></td>
+          <td>MSFT muy barato vs BMA. Ratio en mínimos históricos.</td>
+          <td>Sumá posición fuerte (20-30%)</td>
+          <td>Reducí posición fuerte (20-30%)</td>
+          <td><span class="badge buy">ROTAR → MSFT</span></td>
+        </tr>
+        <tr>
+          <td><strong>&gt; ±3.0σ</strong></td>
+          <td>⚠ Posible ruptura del par. Evento extraordinario.</td>
+          <td>No operés automático. Revisá contexto.</td>
+          <td>No operés automático. Revisá contexto.</td>
+          <td><span class="badge sell">REVISAR PAR</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- CALCULADORA -->
+  <section>
+    <div class="sec-num">05 — CALCULADORA</div>
+    <h2>Calculá tu señal hoy</h2>
+    <p>Ingresá los precios actuales y los datos históricos de la última semana para obtener el Z-Score y la señal de trading.</p>
+
+    <div class="sim-wrap">
+      <div class="sim-title">↗ CALCULADORA DE RATIO Y SEÑAL</div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;color:rgba(245,240,232,0.4);margin-bottom:12px;text-transform:uppercase;">Precios de hoy</div>
+      <div class="input-grid">
+        <div class="igroup">
+          <label>MSFT en ARS (CEDEAR)</label>
+          <input type="number" id="msft_ars" value="525000" step="1000">
+          <div class="unit">pesos por acción</div>
+        </div>
+        <div class="igroup">
+          <label>BMA en ARS (local)</label>
+          <input type="number" id="bma_ars" value="8500" step="100">
+          <div class="unit">pesos por acción</div>
+        </div>
+        <div class="igroup">
+          <label>MSFT en USD (Nasdaq)</label>
+          <input type="number" id="msft_usd" value="420" step="1">
+          <div class="unit">dólares por acción</div>
+        </div>
+        <div class="igroup">
+          <label>CCL referencia (GD30)</label>
+          <input type="number" id="ccl_ref" value="1250" step="10">
+          <div class="unit">pesos por dólar</div>
+        </div>
+      </div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:2px;color:rgba(245,240,232,0.4);margin-bottom:12px;text-transform:uppercase;">Media y desvío histórico del ratio (últimos 20 días)</div>
+      <div class="input-grid">
+        <div class="igroup">
+          <label>Media del ratio (μ)</label>
+          <input type="number" id="ratio_mean" value="60.0" step="0.1">
+          <div class="unit">Ratio histórico</div>
+        </div>
+        <div class="igroup">
+          <label>Desvío estándar (σ)</label>
+          <input type="number" id="ratio_std" value="4.0" step="0.1">
+          <div class="unit">Desvío del ratio</div>
+        </div>
+        <div class="igroup">
+          <label>Umbral de entrada (σ)</label>
+          <input type="number" id="threshold" value="1.5" step="0.1" min="0.5" max="3">
+          <div class="unit">múltiplo de desvío</div>
+        </div>
+        <div class="igroup">
+          <label>% del portafolio a rotar</label>
+          <input type="number" id="port_pct" value="15" step="5" min="5" max="40">
+          <div class="unit">% por señal</div>
+        </div>
+      </div>
+
+      <button class="btn-calc" onclick="calcular()">CALCULAR SEÑAL →</button>
+
+      <div class="result-panel" id="result" style="display:none;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(245,240,232,0.4);margin-bottom:12px;text-transform:uppercase;">Resultado</div>
+        <div class="result-grid">
+          <div class="res-metric">
+            <div class="rl">Ratio actual</div>
+            <div class="rv neu" id="r-ratio">—</div>
+          </div>
+          <div class="res-metric">
+            <div class="rl">Z-Score</div>
+            <div class="rv" id="r-zscore">—</div>
+          </div>
+          <div class="res-metric">
+            <div class="rl">CCL implícito MSFT</div>
+            <div class="rv" id="r-ccl">—</div>
+          </div>
+          <div class="res-metric">
+            <div class="rl">Diferencia vs CCL ref.</div>
+            <div class="rv" id="r-ccldiff">—</div>
+          </div>
+          <div class="res-metric">
+            <div class="rl">MSFT caro/barato</div>
+            <div class="rv" id="r-msft-val">—</div>
+          </div>
+          <div class="res-metric">
+            <div class="rl">Rotación sugerida</div>
+            <div class="rv neu" id="r-rotation">—</div>
+          </div>
+        </div>
+        <div class="signal-banner" id="r-signal">—</div>
+        <div class="explanation" id="r-explain">—</div>
+      </div>
+
+      <canvas id="simCanvas" height="200" style="display:none;"></canvas>
+    </div>
+  </section>
+
+  <!-- PARES VÁLIDOS -->
+  <section>
+    <div class="sec-num">06 — PARES RECOMENDADOS</div>
+    <h2>Pares con mayor lógica en BYMA</h2>
+    <p>Para que el ratio tenga sentido, lo ideal es que ambos activos respondan al mismo driver (dólar, economía local, commodities). Estos pares tienen mayor coherencia que MSFT/BMA:</p>
+
+    <div class="pairs-grid">
+      <div class="pair-card">
+        <div class="pc-name">GGAL <span class="slash">/</span> BMA</div>
+        <p>Dos bancos argentinos. Alta correlación real. Responden igual a riesgo país. Par clásico y muy operado.</p>
+        <div class="pc-corr">★★★★★ Correlación alta</div>
+      </div>
+      <div class="pair-card">
+        <div class="pc-name">MSFT <span class="slash">/</span> AAPL</div>
+        <p>Dos CEDEARs tech. Mismo driver: dólar CCL + tecnología global. El ratio captura divergencias de valuación.</p>
+        <div class="pc-corr">★★★★☆ Correlación alta</div>
+      </div>
+      <div class="pair-card">
+        <div class="pc-name">YPF <span class="slash">/</span> VISTA</div>
+        <p>Dos energéticas argentinas. Responden al precio del petróleo y riesgo local. Par con lógica sectorial.</p>
+        <div class="pc-corr">★★★★☆ Correlación alta</div>
+      </div>
+      <div class="pair-card">
+        <div class="pc-name">GOOGL <span class="slash">/</span> MSFT</div>
+        <p>CEDEARs Big Tech. Mismo driver de fondo. Útil cuando uno diverge por resultado trimestral.</p>
+        <div class="pc-corr">★★★★☆ Correlación alta</div>
+      </div>
+      <div class="pair-card">
+        <div class="pc-name">TXAR <span class="slash">/</span> ALUA</div>
+        <p>Dos industriales/materiales argentinos. Responden a tipo de cambio real y demanda local.</p>
+        <div class="pc-corr">★★★☆☆ Correlación media</div>
+      </div>
+      <div class="pair-card" style="border: 2px dashed var(--gold); background: #fffef5;">
+        <div class="pc-name" style="color:var(--gold)">MSFT <span class="slash" style="color:var(--border)">/</span> BMA</div>
+        <p style="color:var(--gold);">Tu par actual. Baja correlación intrínseca, pero el ratio sigue siendo válido para capturar movimientos relativos de CCL.</p>
+        <div class="pc-corr" style="color:var(--gold);">★★☆☆☆ Correlación baja — usar con filtro CCL</div>
+      </div>
+    </div>
+
+    <div class="alert danger" style="margin-top:20px;">
+      <div class="icon">⚠️</div>
+      <div class="body">
+        <strong>Sobre MSFT/BMA específicamente</strong>
+        El par no está cointegrado por fundamentals (son sectores y geografías distintas). Lo que podés aprovechar es el movimiento relativo del CCL implícito de cada uno. Cuando el CCL implícito de MSFT sube mucho más que el CCL de referencia, MSFT está caro en dólares → reducís. Cuando está igual o más bajo, MSFT es una buena forma de dolarizarte.
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>RATIO TRADING · BYMA · CEDEARs · CCL IMPLÍCITO · SIN SHORT</footer>
+
+<script>
+function calcular() {
+  const msft_ars = parseFloat(document.getElementById('msft_ars').value);
+  const bma_ars = parseFloat(document.getElementById('bma_ars').value);
+  const msft_usd = parseFloat(document.getElementById('msft_usd').value);
+  const ccl_ref = parseFloat(document.getElementById('ccl_ref').value);
+  const ratio_mean = parseFloat(document.getElementById('ratio_mean').value);
+  const ratio_std = parseFloat(document.getElementById('ratio_std').value);
+  const threshold = parseFloat(document.getElementById('threshold').value);
+  const port_pct = parseFloat(document.getElementById('port_pct').value);
+
+  const ratio = msft_ars / bma_ars;
+  const zscore = (ratio - ratio_mean) / ratio_std;
+  const ccl_impl = msft_ars / msft_usd;
+  const ccl_diff_pct = ((ccl_impl - ccl_ref) / ccl_ref) * 100;
+
+  // Show result
+  document.getElementById('result').style.display = 'block';
+
+  document.getElementById('r-ratio').textContent = ratio.toFixed(2);
+
+  const zEl = document.getElementById('r-zscore');
+  zEl.textContent = (zscore >= 0 ? '+' : '') + zscore.toFixed(2) + 'σ';
+  zEl.className = 'rv ' + (zscore > 0.5 ? 'down' : zscore < -0.5 ? 'up' : 'neu');
+
+  document.getElementById('r-ccl').textContent = '$' + Math.round(ccl_impl).toLocaleString('es-AR');
+
+  const cclDiffEl = document.getElementById('r-ccldiff');
+  cclDiffEl.textContent = (ccl_diff_pct >= 0 ? '+' : '') + ccl_diff_pct.toFixed(1) + '%';
+  cclDiffEl.className = 'rv ' + (ccl_diff_pct > 2 ? 'down' : ccl_diff_pct < -2 ? 'up' : 'neu');
+
+  const msftValEl = document.getElementById('r-msft-val');
+  if (ccl_diff_pct > 3) { msftValEl.textContent = 'CARO en USD'; msftValEl.className = 'rv down'; }
+  else if (ccl_diff_pct < -3) { msftValEl.textContent = 'BARATO en USD'; msftValEl.className = 'rv up'; }
+  else { msftValEl.textContent = 'A precio justo'; msftValEl.className = 'rv neu'; }
+
+  // Signal
+  const signalEl = document.getElementById('r-signal');
+  const rotEl = document.getElementById('r-rotation');
+  const explEl = document.getElementById('r-explain');
+
+  let pct = Math.min(Math.abs(zscore) / threshold, 2) * port_pct;
+  pct = Math.round(pct / 5) * 5;
+  pct = Math.max(5, Math.min(pct, port_pct * 2));
+
+  if (zscore > threshold * 1.33) {
+    signalEl.textContent = '▼ ROTAR DE MSFT → BMA';
+    signalEl.className = 'signal-banner comprar-local';
+    rotEl.textContent = pct + '% del portafolio';
+    rotEl.className = 'rv down';
+    explEl.textContent = `MSFT está caro relativamente: el ratio ${ratio.toFixed(1)} está ${zscore.toFixed(1)} desvíos por encima de su media. Además, el CCL implícito de MSFT está ${ccl_diff_pct > 0 ? 'un ' + ccl_diff_pct.toFixed(1) + '% por encima' : 'alineado'} con el CCL de referencia. Acción: vendé MSFT y comprá BMA con aproximadamente el ${pct}% del portafolio.`;
+  } else if (zscore < -threshold * 1.33) {
+    signalEl.textContent = '▲ ROTAR DE BMA → MSFT';
+    signalEl.className = 'signal-banner comprar-cedear';
+    rotEl.textContent = pct + '% del portafolio';
+    rotEl.className = 'rv up';
+    explEl.textContent = `MSFT está barato relativamente: el ratio ${ratio.toFixed(1)} está ${Math.abs(zscore).toFixed(1)} desvíos por debajo de su media. ${ccl_diff_pct < 0 ? 'Además, el CCL implícito de MSFT está ' + Math.abs(ccl_diff_pct).toFixed(1) + '% más barato que el CCL de referencia — es una oportunidad de dolarización a descuento.' : 'Verificá el CCL implícito antes de ejecutar.'} Acción: vendé BMA y comprá MSFT con aproximadamente el ${pct}% del portafolio.`;
+  } else if (zscore > threshold * 0.66) {
+    signalEl.textContent = '→ LEVE SESGO HACIA BMA';
+    signalEl.className = 'signal-banner rotar';
+    rotEl.textContent = '5-10% del portafolio';
+    rotEl.className = 'rv neu';
+    explEl.textContent = `El ratio está levemente elevado (${ratio.toFixed(1)}, Z-Score ${zscore.toFixed(2)}) pero sin señal fuerte. Podés hacer un ajuste táctico menor si tenés sobrexposición en MSFT.`;
+  } else if (zscore < -threshold * 0.66) {
+    signalEl.textContent = '→ LEVE SESGO HACIA MSFT';
+    signalEl.className = 'signal-banner rotar';
+    rotEl.textContent = '5-10% del portafolio';
+    rotEl.className = 'rv neu';
+    explEl.textContent = `El ratio está levemente bajo (${ratio.toFixed(1)}, Z-Score ${zscore.toFixed(2)}) pero sin señal fuerte. Podés hacer un ajuste táctico menor si tenés sobrexposición en BMA.`;
+  } else {
+    signalEl.textContent = '= MANTENER POSICIÓN ACTUAL';
+    signalEl.className = 'signal-banner mantener';
+    rotEl.textContent = '0%';
+    rotEl.className = 'rv neu';
+    explEl.textContent = `El ratio ${ratio.toFixed(1)} está dentro de la zona neutral (Z-Score: ${zscore.toFixed(2)}). No hay señal de trading. Mantené tu posición actual y revisá mañana.`;
+  }
+
+  // Draw mini chart
+  drawMiniChart(ratio, ratio_mean, ratio_std, threshold);
+}
+
+function drawMiniChart(currentRatio, mean, std, threshold) {
+  const canvas = document.getElementById('simCanvas');
+  canvas.style.display = 'block';
+  const W = canvas.offsetWidth;
+  const H = 200;
+  canvas.width = W;
+  canvas.height = H;
+
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#1a1612';
+  ctx.fillRect(0, 0, W, H);
+
+  // Simulate ratio history converging to current
+  const n = 60;
+  const history = [];
+  let r = mean + (Math.random() - 0.5) * std;
+  for (let i = 0; i < n - 1; i++) {
+    r += (mean - r) * 0.08 + (Math.random() - 0.5) * std * 0.4;
+    history.push(r);
+  }
+  history.push(currentRatio);
+
+  const allVals = [...history, mean + threshold * std * 1.5, mean - threshold * std * 1.5];
+  const minV = Math.min(...allVals) * 0.99;
+  const maxV = Math.max(...allVals) * 1.01;
+
+  const sx = i => (i / (n-1)) * (W - 40) + 20;
+  const sy = v => H - 20 - ((v - minV) / (maxV - minV)) * (H - 40);
+
+  // Zones
+  for (let i = 0; i < n; i++) {
+    const x = sx(i);
+    const yu = sy(mean + threshold * std);
+    const yl = sy(mean - threshold * std);
+    ctx.fillStyle = 'rgba(231,76,60,0.08)';
+    ctx.fillRect(x, 16, 1, yu - 16);
+    ctx.fillRect(x, yl, 1, H - 20 - yl);
+    ctx.fillStyle = 'rgba(39,174,96,0.08)';
+    ctx.fillRect(x, yu, 1, yl - yu);
+  }
+
+  // Threshold lines
+  ctx.setLineDash([4, 4]);
+  ctx.strokeStyle = 'rgba(231,76,60,0.5)';
+  ctx.lineWidth = 1;
+  [[mean + threshold * std], [mean - threshold * std]].forEach(([v]) => {
+    ctx.beginPath();
+    ctx.moveTo(sx(0), sy(v)); ctx.lineTo(sx(n-1), sy(v));
+    ctx.stroke();
+  });
+
+  // Mean
+  ctx.strokeStyle = 'rgba(212,130,26,0.6)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(sx(0), sy(mean)); ctx.lineTo(sx(n-1), sy(mean));
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Ratio line
+  ctx.strokeStyle = '#f5f0e8';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  history.forEach((v, i) => { i === 0 ? ctx.moveTo(sx(i), sy(v)) : ctx.lineTo(sx(i), sy(v)); });
+  ctx.stroke();
+
+  // Current point
+  const lastX = sx(n-1);
+  const lastY = sy(currentRatio);
+  const zscore = (currentRatio - mean) / std;
+  ctx.fillStyle = Math.abs(zscore) > threshold ? '#e74c3c' : '#27ae60';
+  ctx.shadowColor = ctx.fillStyle;
+  ctx.shadowBlur = 8;
+  ctx.beginPath();
+  ctx.arc(lastX, lastY, 5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  // Labels
+  ctx.fillStyle = 'rgba(245,240,232,0.4)';
+  ctx.font = '10px IBM Plex Mono, monospace';
+  ctx.fillText('RATIO (60 días simulados)', 22, 14);
+  ctx.fillText('HOY: ' + currentRatio.toFixed(1), lastX - 50, lastY - 10);
+}
+
+// Auto-calculate on load
+window.addEventListener('load', calcular);
+document.querySelectorAll('input').forEach(el => el.addEventListener('change', () => {}));
+</script>
+</body>
+</html>

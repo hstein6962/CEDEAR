@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CEDEAR Screener · Señal de Reversal</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:     #05070d;
+  --bg2:    #090c14;
+  --s1:     #0d1020;
+  --s2:     #111528;
+  --s3:     #182030;
+  --border: #1e2840;
+  --ink:    #c8d4e8;
+  --muted:  #3d4f6a;
+  --dim:    #232f48;
+  --green:  #00ff88;
+  --red:    #ff2244;
+  --amber:  #ffaa00;
+  --cyan:   #00ccff;
+  --purple: #aa66ff;
+  --white:  #e8f0ff;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Barlow', sans-serif;
+  font-weight: 300;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* NOISE OVERLAY */
+body::after {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: 0.5;
+}
+
+/* SCAN LINES */
+body::before {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,204,255,.012) 3px, rgba(0,204,255,.012) 4px);
+}
+
+.wrap { max-width:1360px; margin:0 auto; padding:0 24px 80px; position:relative; z-index:1; }
+
+/* ── HERO ── */
+.hero {
+  padding: 48px 0 36px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+.hero-bg-text {
+  position: absolute;
+  right: -10px;
+  top: 10px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(80px, 15vw, 160px);
+  color: rgba(0,204,255,0.03);
+  pointer-events: none;
+  letter-spacing: 4px;
+  line-height: 1;
+  user-select: none;
+}
+
+.hero-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: var(--cyan);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hero-tag::before {
+  content:'';
+  display:block;
+  width: 24px;
+  height: 1px;
+  background: var(--cyan);
+}
+
+.hero h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(48px, 8vw, 96px);
+  line-height: .95;
+  letter-spacing: 2px;
+  color: var(--white);
+  margin-bottom: 10px;
+}
+
+.hero h1 em {
+  color: var(--green);
+  font-style: normal;
+}
+
+.hero-sub {
+  font-size: 14px;
+  color: var(--muted);
+  max-width: 560px;
+  line-height: 1.7;
+  font-weight: 300;
+}
+
+/* ── FILTER CHIPS ── */
+.filter-strip {
+  display: flex;
+  gap: 6px;
+  padding: 20px 0 0;
+  flex-wrap: wrap;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border: 1px solid var(--border);
+  background: var(--s1);
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .5px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.chip .chip-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+}
+
+.chip.active { border-color: var(--green); color: var(--green); background: rgba(0,255,136,.05); }
+.chip.active .chip-dot { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.chip.mm .chip-dot { background: var(--cyan); }
+.chip.mm.active { border-color: var(--cyan); color: var(--cyan); background: rgba(0,204,255,.05); }
+.chip.rsi .chip-dot { background: var(--amber); }
+.chip.rsi.active { border-color: var(--amber); color: var(--amber); background: rgba(255,170,0,.05); }
+.chip.velas .chip-dot { background: var(--red); }
+.chip.velas.active { border-color: var(--red); color: var(--red); background: rgba(255,34,68,.05); }
+.chip.esto .chip-dot { background: var(--purple); }
+.chip.esto.active { border-color: var(--purple); color: var(--purple); background: rgba(170,102,255,.05); }
+
+/* ── ACTION BAR ── */
+.action-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 0 16px;
+  flex-wrap: wrap;
+}
+
+.btn-scan {
+  background: var(--green);
+  color: var(--bg);
+  border: none;
+  padding: 12px 32px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-weight: 700;
+  transition: all .2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-scan::before {
+  content:'';
+  position:absolute; inset:0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.3), transparent);
+  transform: translateX(-100%);
+  transition: transform .4s;
+}
+
+.btn-scan:hover::before { transform: translateX(100%); }
+.btn-scan:hover { box-shadow: 0 0 24px rgba(0,255,136,.4); }
+.btn-scan:disabled { opacity:.35; cursor:not-allowed; }
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 11px 20px;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .2s;
+}
+.btn-ghost:hover { border-color: var(--ink); color: var(--ink); }
+
+.scan-count {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  margin-left: auto;
+}
+
+.scan-count em { color: var(--green); font-style: normal; }
+
+/* ── PROGRESS ── */
+.progress-wrap {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  padding: 20px 24px;
+  margin: 10px 0;
+  display: none;
+}
+
+.progress-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--cyan);
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.progress-bar-outer {
+  height: 3px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.progress-bar-inner {
+  height: 100%;
+  background: linear-gradient(90deg, var(--cyan), var(--green));
+  width: 0%;
+  transition: width .3s;
+  box-shadow: 0 0 8px var(--cyan);
+}
+
+.progress-detail {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 8px;
+  font-family: 'Space Mono', monospace;
+  min-height: 16px;
+}
+
+/* ── RESULTS ── */
+.results-header {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin: 28px 0 14px;
+}
+
+.results-header h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  letter-spacing: 1px;
+  color: var(--white);
+}
+
+.results-header .rh-count {
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  color: var(--green);
+}
+
+.results-header .rh-empty {
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ── TABLE ── */
+.tbl-wrap { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead tr {
+  background: var(--s2);
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  padding: 10px 14px;
+  text-align: left;
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: color .15s;
+}
+
+th:hover { color: var(--ink); }
+th.sort-asc::after { content: ' ↑'; color: var(--green); }
+th.sort-desc::after { content: ' ↓'; color: var(--green); }
+
+tbody tr {
+  border-bottom: 1px solid rgba(30,40,64,.7);
+  transition: background .12s;
+  animation: fadeRow .4s ease both;
+}
+
+@keyframes fadeRow {
+  from { opacity:0; transform: translateY(6px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+
+tbody tr:hover { background: rgba(0,204,255,.03); }
+
+td {
+  padding: 13px 14px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.td-ticker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.td-ticker-sym {
+  font-family: 'Space Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--white);
+}
+
+.td-ticker-name {
+  font-size: 11px;
+  color: var(--muted);
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* INDICATOR CELLS */
+.ind-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-end;
+}
+
+.ind-val {
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+}
+
+.ind-bar {
+  width: 60px;
+  height: 3px;
+  background: var(--dim);
+  overflow: hidden;
+}
+
+.ind-bar-fill {
+  height: 100%;
+}
+
+/* COLOR HELPERS */
+.c-green  { color: var(--green); }
+.c-red    { color: var(--red); }
+.c-amber  { color: var(--amber); }
+.c-cyan   { color: var(--cyan); }
+.c-purple { color: var(--purple); }
+.c-muted  { color: var(--muted); }
+.c-white  { color: var(--white); }
+
+/* SIGNAL BADGE */
+.sig-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+
+.sig-badge.full {
+  background: rgba(0,255,136,.12);
+  border: 1px solid rgba(0,255,136,.4);
+  color: var(--green);
+  box-shadow: 0 0 12px rgba(0,255,136,.15);
+}
+
+.sig-badge.partial {
+  background: rgba(255,170,0,.08);
+  border: 1px solid rgba(255,170,0,.3);
+  color: var(--amber);
+}
+
+.sig-badge::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: blink 1.5s infinite;
+}
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* VELAS CELL */
+.velas-cell {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.vela {
+  width: 10px;
+  border-radius: 1px;
+}
+
+.vela.bear { background: var(--red); }
+.vela.bull { background: var(--green); }
+.vela.doji { background: var(--muted); }
+
+/* EMPTY / LOADING STATE */
+.empty-state {
+  text-align: center;
+  padding: 64px 20px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  border: 1px dashed var(--border);
+}
+
+.empty-state .es-big {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 48px;
+  color: var(--dim);
+  display: block;
+  margin-bottom: 12px;
+  letter-spacing: 3px;
+}
+
+/* LOG */
+.log-section {
+  margin-top: 32px;
+}
+
+.log-toggle {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  user-select: none;
+  transition: color .15s;
+}
+
+.log-toggle:hover { color: var(--ink); }
+
+.log-box {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 14px;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.9;
+  display: none;
+}
+
+.log-box .log-ok  { color: var(--green); }
+.log-box .log-err { color: var(--red); }
+.log-box .log-warn { color: var(--amber); }
+.log-box .log-info { color: var(--cyan); }
+
+/* TOOLTIP */
+.tooltip-wrap { position: relative; display: inline-block; }
+.tooltip-wrap:hover .tooltip-box { display: block; }
+.tooltip-box {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--s3);
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  font-size: 11px;
+  color: var(--ink);
+  white-space: nowrap;
+  z-index: 100;
+  font-family: 'Barlow', sans-serif;
+  font-weight: 300;
+  pointer-events: none;
+}
+
+/* MINI CHART */
+.mini-chart { display: flex; align-items: flex-end; gap: 2px; height: 32px; }
+.mini-bar { width: 6px; border-radius: 1px 1px 0 0; transition: height .3s; }
+.mini-bar.up   { background: var(--green); opacity: .7; }
+.mini-bar.down { background: var(--red);   opacity: .7; }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 20px; right: 20px;
+  background: var(--green); color: var(--bg);
+  padding: 10px 18px;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px; letter-spacing: 1px;
+  z-index: 9999; opacity: 0; transition: opacity .3s;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; }
+
+@media (max-width: 700px) {
+  .hero h1 { font-size: 52px; }
+  .hero-bg-text { display: none; }
+  td, th { padding: 10px 10px; }
+  .td-ticker-name { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg-text">SCREENER</div>
+  <div class="hero-tag">BYMA · CEDEAR TÉCNICO · SEÑAL DE REVERSAL</div>
+  <h1>CEDEAR<br><em>SCREENER</em></h1>
+  <p class="hero-sub">Detecta CEDEARs en posible punto de inflexión alcista: precio sobre MM200, RSI sobrevendido, últimas 3 velas bajistas y Estocástico girando hacia arriba.</p>
+
+  <!-- FILTER CHIPS -->
+  <div class="filter-strip">
+    <div class="chip mm active"><div class="chip-dot"></div>MM200: PRECIO ARRIBA</div>
+    <div class="chip rsi active"><div class="chip-dot"></div>RSI: 20 – 30</div>
+    <div class="chip velas active"><div class="chip-dot"></div>3 VELAS BAJISTAS</div>
+    <div class="chip esto active"><div class="chip-dot"></div>ESTOCÁSTICO: 15 – 25 ↑</div>
+  </div>
+</div>
+
+<!-- ACTION BAR -->
+<div class="action-bar">
+  <button class="btn-scan" id="btnScan" onclick="iniciarScan()">▶ INICIAR SCAN</button>
+  <button class="btn-ghost" onclick="exportarCSV()">↓ EXPORTAR CSV</button>
+  <div class="scan-count" id="scanCount">
+    Universo: <em id="universoCount">—</em> CEDEARs · Encontrados: <em id="foundCount">—</em>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-wrap" id="progressWrap">
+  <div class="progress-label">
+    <span id="progLabel">ESCANEANDO…</span>
+    <span id="progPct">0%</span>
+  </div>
+  <div class="progress-bar-outer">
+    <div class="progress-bar-inner" id="progBar"></div>
+  </div>
+  <div class="progress-detail" id="progDetail">Iniciando…</div>
+</div>
+
+<!-- RESULTS -->
+<div class="results-header">
+  <h2>SEÑALES</h2>
+  <span class="rh-count" id="rh-count" style="display:none"></span>
+  <span class="rh-empty" id="rh-empty">Presioná INICIAR SCAN para comenzar</span>
+</div>
+
+<div class="tbl-wrap">
+  <div id="tableArea">
+    <div class="empty-state">
+      <span class="es-big">WAIT</span>
+      El scanner analizará todos los CEDEARs disponibles en BYMA<br>y filtrará los que cumplan los 4 criterios técnicos
+    </div>
+  </div>
+</div>
+
+<!-- LOG -->
+<div class="log-section">
+  <div class="log-toggle" onclick="toggleLog()">
+    <span id="logArrow">▶</span>
+    <span>LOG DE PROCESAMIENTO</span>
+    <span id="logCount" style="color:var(--green)"></span>
+  </div>
+  <div class="log-box" id="logBox"></div>
+</div>
+
+</div><!-- /wrap -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  ESTADO GLOBAL
+// ══════════════════════════════════════════════════
+const BASE = 'https://open.bymadata.com.ar/vanoms-be-core/rest/api/bymadata/free/';
+let resultados = [];
+let logLines = [];
+let sortCol = 'rsi';
+let sortDir = 'asc';
+
+// ── LOG ──────────────────────────────────────────
+function addLog(msg, type = 'info') {
+  const ts = new Date().toLocaleTimeString('es-AR', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  logLines.push({ts, msg, type});
+  const box = document.getElementById('logBox');
+  const div = document.createElement('div');
+  div.className = 'log-' + type;
+  div.textContent = `[${ts}] ${msg}`;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+  document.getElementById('logCount').textContent = `(${logLines.length})`;
+}
+
+function toggleLog() {
+  const box = document.getElementById('logBox');
+  const arr = document.getElementById('logArrow');
+  const show = box.style.display === 'none' || !box.style.display;
+  box.style.display = show ? 'block' : 'none';
+  arr.textContent = show ? '▼' : '▶';
+}
+
+// ── TOAST ────────────────────────────────────────
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+// ── PROGRESS ─────────────────────────────────────
+function setProgress(pct, label, detail) {
+  document.getElementById('progBar').style.width = pct + '%';
+  document.getElementById('progPct').textContent = Math.round(pct) + '%';
+  if (label) document.getElementById('progLabel').textContent = label;
+  if (detail) document.getElementById('progDetail').textContent = detail;
+}
+
+// ── FETCH HISTÓRICO ───────────────────────────────
+// Usa el endpoint de chart/history de OpenBYMAData
+async function fetchHistorico(ticker) {
+  // Intentar con endpoint chart-data (histórico diario)
+  const url = `${BASE}bnown-equity-chart-data?symbol=${encodeURIComponent(ticker)}&resolution=D&range=365`;
+  const r = await fetch(url, { headers:{ Accept:'application/json' } });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  const j = await r.json();
+  return j;
+}
+
+async function fetchHistoricoCedear(ticker) {
+  const url = `${BASE}bnown-cedears-chart-data?symbol=${encodeURIComponent(ticker)}&resolution=D&range=365`;
+  const r = await fetch(url, { headers:{ Accept:'application/json' } });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
+}
+
+// ── CALCULAR INDICADORES ──────────────────────────
+
+function calcMM(closes, period) {
+  if (closes.length < period) return null;
+  const slice = closes.slice(-period);
+  return slice.reduce((a, b) => a + b, 0) / period;
+}
+
+function calcRSI(closes, period = 14) {
+  if (closes.length < period + 1) return null;
+  const slice = closes.slice(-(period + 1));
+  let gains = 0, losses = 0;
+  for (let i = 1; i < slice.length; i++) {
+    const d = slice[i] - slice[i - 1];
+    if (d > 0) gains += d; else losses -= d;
+  }
+  const avgG = gains / period;
+  const avgL = losses / period;
+  if (avgL === 0) return 100;
+  const rs = avgG / avgL;
+  return 100 - 100 / (1 + rs);
+}
+
+function calcEstocastico(candles, kPeriod = 14, dPeriod = 3) {
+  if (candles.length < kPeriod + dPeriod) return { k: null, d: null, trend: null };
+
+  // Calcular K para los últimos dPeriod días
+  const kValues = [];
+  for (let i = candles.length - dPeriod; i < candles.length; i++) {
+    const window = candles.slice(i - kPeriod + 1, i + 1);
+    const high = Math.max(...window.map(c => c.high));
+    const low  = Math.min(...window.map(c => c.low));
+    const close = candles[i].close;
+    const k = low === high ? 50 : ((close - low) / (high - low)) * 100;
+    kValues.push(k);
+  }
+
+  const kActual = kValues[kValues.length - 1];
+  const dActual = kValues.reduce((a, b) => a + b, 0) / kValues.length;
+  const trend = kValues.length >= 2 ? (kValues[kValues.length - 1] > kValues[kValues.length - 2] ? 'up' : 'down') : null;
+
+  return { k: kActual, d: dActual, trend };
+}
+
+function check3VelasBajistas(candles) {
+  if (candles.length < 3) return false;
+  const last3 = candles.slice(-3);
+  return last3.every(c => c.close < c.open);
+}
+
+function parseHistorico(data) {
+  // OpenBYMAData devuelve { t:[], o:[], h:[], l:[], c:[], v:[] }
+  // o puede devolver { data: [{date, open, high, low, close, volume}] }
+  if (!data) return [];
+
+  if (data.t && data.c) {
+    // formato OHLCV arrays
+    return data.t.map((ts, i) => ({
+      date: new Date(ts * 1000),
+      open: data.o?.[i] ?? data.c[i],
+      high: data.h?.[i] ?? data.c[i],
+      low:  data.l?.[i] ?? data.c[i],
+      close: data.c[i],
+    })).filter(c => c.close > 0);
+  }
+
+  if (data.data && Array.isArray(data.data)) {
+    return data.data.map(d => ({
+      date: new Date(d.date || d.t),
+      open: d.open ?? d.o ?? d.close,
+      high: d.high ?? d.h ?? d.close,
+      low:  d.low  ?? d.l ?? d.close,
+      close: d.close ?? d.c,
+    })).filter(c => c.close > 0);
+  }
+
+  // Formato lista plana con last
+  if (Array.isArray(data)) {
+    return data.map(d => ({
+      date: new Date(d.date || d.tradingDate),
+      open: d.open ?? d.o ?? d.close,
+      high: d.high ?? d.h ?? d.close,
+      low:  d.low  ?? d.l ?? d.close,
+      close: d.close ?? d.last ?? d.c,
+    })).filter(c => c.close > 0);
+  }
+
+  return [];
+}
+
+// ── ANALIZAR UN CEDEAR ────────────────────────────
+async function analizarCedear(sym, nombre) {
+  let candles = [];
+
+  // Intentar endpoint CEDEAR primero, luego equity
+  const endpoints = [
+    `bnown-cedears-chart-data?symbol=${encodeURIComponent(sym)}&resolution=D&range=365`,
+    `bnown-equity-chart-data?symbol=${encodeURIComponent(sym)}&resolution=D&range=365`,
+    `equity-chart-data?symbol=${encodeURIComponent(sym)}&resolution=D`,
+    `chart-data?symbol=${encodeURIComponent(sym)}&resolution=D`,
+  ];
+
+  for (const ep of endpoints) {
+    try {
+      const r = await fetch(BASE + ep, { headers:{ Accept:'application/json' }, signal: AbortSignal.timeout(8000) });
+      if (!r.ok) continue;
+      const j = await r.json();
+      candles = parseHistorico(j);
+      if (candles.length >= 50) break;
+    } catch(e) { /* try next */ }
+  }
+
+  if (candles.length < 50) return null; // datos insuficientes
+
+  const closes = candles.map(c => c.close);
+  const last = closes[closes.length - 1];
+
+  // 1 — MM200
+  const mm200 = calcMM(closes, 200);
+  if (!mm200) return null;
+  const sobreMM200 = last > mm200;
+
+  // 2 — RSI 14
+  const rsi = calcRSI(closes, 14);
+  if (rsi === null) return null;
+  const rsiOk = rsi >= 20 && rsi <= 30;
+
+  // 3 — 3 velas bajistas
+  const velasBajistas = check3VelasBajistas(candles);
+
+  // 4 — Estocástico 14,3
+  const esto = calcEstocastico(candles, 14, 3);
+  const estoOk = esto.k !== null
+    && esto.k >= 15 && esto.k <= 25
+    && esto.trend === 'up';
+
+  // Contar filtros cumplidos
+  const filtros = [sobreMM200, rsiOk, velasBajistas, estoOk];
+  const cumplidos = filtros.filter(Boolean).length;
+
+  return {
+    ticker: sym,
+    nombre,
+    last,
+    mm200: mm200 ? mm200.toFixed(2) : null,
+    sobreMM200,
+    rsi: rsi ? rsi.toFixed(1) : null,
+    rsiOk,
+    estoK: esto.k ? esto.k.toFixed(1) : null,
+    estoD: esto.d ? esto.d.toFixed(1) : null,
+    estoTrend: esto.trend,
+    estoOk,
+    velasBajistas,
+    ultimas3: candles.slice(-3),
+    candles: candles.slice(-20), // últimas 20 para mini chart
+    cumplidos,
+    filtros,
+    pctMM: mm200 ? (((last - mm200) / mm200) * 100).toFixed(1) : null,
+  };
+}
+
+// ── RENDER RESULTADOS ─────────────────────────────
+function renderResultados(items) {
+  const area = document.getElementById('tableArea');
+
+  if (items.length === 0) {
+    area.innerHTML = `<div class="empty-state">
+      <span class="es-big">0</span>
+      Ningún CEDEAR cumple los 4 filtros en este momento.<br>
+      Revisá el log para ver qué filtros casi se cumplen.
+    </div>`;
+    document.getElementById('rh-count').style.display = 'none';
+    document.getElementById('rh-empty').textContent = 'Sin señales con los 4 filtros activos';
+    return;
+  }
+
+  document.getElementById('rh-count').style.display = 'inline';
+  document.getElementById('rh-count').textContent = `${items.length} señal${items.length > 1 ? 'es' : ''} detectada${items.length > 1 ? 's' : ''}`;
+  document.getElementById('rh-empty').textContent = '';
+
+  // Ordenar
+  items = [...items].sort((a, b) => {
+    let va = parseFloat(a[sortCol]) || 0;
+    let vb = parseFloat(b[sortCol]) || 0;
+    return sortDir === 'asc' ? va - vb : vb - va;
+  });
+
+  area.innerHTML = `
+  <table id="mainTable">
+    <thead>
+      <tr>
+        <th onclick="sortBy('ticker')">TICKER</th>
+        <th onclick="sortBy('last')">ÚLTIMO</th>
+        <th onclick="sortBy('pctMM')">vs MM200</th>
+        <th onclick="sortBy('rsi')">RSI</th>
+        <th>VELAS</th>
+        <th onclick="sortBy('estoK')">ESTO K</th>
+        <th onclick="sortBy('estoD')">ESTO D</th>
+        <th>TENDENCIA</th>
+        <th>SEÑAL</th>
+        <th>ÚLTIMAS 20</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${items.map((r, i) => renderFila(r, i)).join('')}
+    </tbody>
+  </table>`;
+
+  // Marcar columna de orden
+  document.querySelectorAll('th').forEach(th => {
+    th.classList.remove('sort-asc','sort-desc');
+  });
+}
+
+function renderFila(r, i) {
+  const sigClass = r.cumplidos === 4 ? 'full' : 'partial';
+  const sigText  = r.cumplidos === 4 ? '★ SEÑAL COMPLETA' : `${r.cumplidos}/4 FILTROS`;
+
+  // Mini chart últimas 20 velas
+  const miniMax = Math.max(...r.candles.map(c => c.close));
+  const miniMin = Math.min(...r.candles.map(c => c.close));
+  const miniRange = miniMax - miniMin || 1;
+  const miniChart = r.candles.map(c => {
+    const h = Math.max(4, ((c.close - miniMin) / miniRange) * 32);
+    const cls = c.close >= c.open ? 'up' : 'down';
+    return `<div class="mini-bar ${cls}" style="height:${h.toFixed(0)}px"></div>`;
+  }).join('');
+
+  // Últimas 3 velas
+  const velasHtml = r.ultimas3.map(c => {
+    const h = Math.max(12, Math.abs(c.close - c.open) / c.close * 400 + 12);
+    const cls = c.close < c.open ? 'bear' : c.close > c.open ? 'bull' : 'doji';
+    return `<div class="vela ${cls}" style="height:${Math.min(h,28)}px" title="${cls}: ${c.close.toFixed(2)}"></div>`;
+  }).join('');
+
+  const rsiColor = r.rsiOk ? 'c-amber' : parseFloat(r.rsi) < 20 ? 'c-red' : 'c-muted';
+  const estoColor = r.estoOk ? 'c-purple' : 'c-muted';
+  const mmColor = r.sobreMM200 ? 'c-cyan' : 'c-red';
+  const pctSign = parseFloat(r.pctMM) >= 0 ? '+' : '';
+
+  return `
+  <tr style="animation-delay:${i * 40}ms">
+    <td>
+      <div class="td-ticker">
+        <div>
+          <div class="td-ticker-sym">${r.ticker}</div>
+          <div class="td-ticker-name">${r.nombre}</div>
+        </div>
+      </div>
+    </td>
+    <td class="c-white" style="font-family:'Space Mono',monospace;font-size:13px">
+      $${Number(r.last).toLocaleString('es-AR', {maximumFractionDigits:2})}
+    </td>
+    <td>
+      <div class="ind-cell">
+        <span class="${mmColor}" style="font-family:'Space Mono',monospace;font-size:12px">
+          ${pctSign}${r.pctMM}%
+        </span>
+        <span style="font-size:10px;color:var(--muted)">MM: $${Number(r.mm200).toLocaleString('es-AR',{maximumFractionDigits:1})}</span>
+      </div>
+    </td>
+    <td>
+      <div class="ind-cell">
+        <span class="${rsiColor}" style="font-family:'Space Mono',monospace;font-size:14px;font-weight:700">${r.rsi}</span>
+        <div class="ind-bar"><div class="ind-bar-fill" style="width:${r.rsi}%;background:${r.rsiOk?'var(--amber)':'var(--muted)'}"></div></div>
+      </div>
+    </td>
+    <td>
+      <div class="velas-cell">${velasHtml}</div>
+      <div style="font-size:9px;color:${r.velasBajistas?'var(--red)':'var(--muted)'};margin-top:4px;font-family:'Space Mono',monospace">
+        ${r.velasBajistas ? '✓ 3 BEAR' : '✗ NO'}
+      </div>
+    </td>
+    <td>
+      <div class="ind-cell">
+        <span class="${estoColor}" style="font-family:'Space Mono',monospace;font-size:14px;font-weight:700">${r.estoK}</span>
+        <div class="ind-bar"><div class="ind-bar-fill" style="width:${r.estoK}%;background:${r.estoOk?'var(--purple)':'var(--muted)'}"></div></div>
+      </div>
+    </td>
+    <td class="${estoColor}" style="font-family:'Space Mono',monospace;font-size:12px">${r.estoD}</td>
+    <td style="font-family:'Space Mono',monospace;font-size:11px;color:${r.estoTrend==='up'?'var(--green)':'var(--muted)'}">
+      ${r.estoTrend === 'up' ? '↑ GIRANDO' : '↓ BAJA'}
+    </td>
+    <td><span class="sig-badge ${sigClass}">${sigText}</span></td>
+    <td><div class="mini-chart">${miniChart}</div></td>
+  </tr>`;
+}
+
+// ── SORT ─────────────────────────────────────────
+function sortBy(col) {
+  if (sortCol === col) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  else { sortCol = col; sortDir = 'asc'; }
+  renderResultados(resultados);
+}
+
+// ── SCAN PRINCIPAL ────────────────────────────────
+async function iniciarScan() {
+  const btn = document.getElementById('btnScan');
+  btn.disabled = true;
+  resultados = [];
+  logLines = [];
+  document.getElementById('logBox').innerHTML = '';
+
+  document.getElementById('progressWrap').style.display = 'block';
+  document.getElementById('rh-empty').textContent = 'Escaneando…';
+  document.getElementById('rh-count').style.display = 'none';
+  document.getElementById('tableArea').innerHTML = '<div class="empty-state"><span class="es-big" style="animation:blink 1s infinite">…</span>Trayendo lista de CEDEARs desde BYMA</div>';
+
+  setProgress(0, 'CARGANDO UNIVERSO CEDEAR…', 'Conectando con open.bymadata.com.ar');
+  addLog('Iniciando scan de CEDEARs BYMA', 'info');
+
+  // 1 — Traer lista de todos los CEDEARs
+  let cedearList = [];
+  try {
+    const r = await fetch(BASE + 'bnown-cedears', { headers:{ Accept:'application/json' } });
+    const j = await r.json();
+    const raw = j.data || j || [];
+    cedearList = raw
+      .filter(d => d.symbol || d.ticker)
+      .map(d => ({
+        sym: (d.symbol || d.ticker || '').toUpperCase().trim(),
+        nombre: d.description || d.name || d.symbol || '',
+      }))
+      .filter(d => d.sym.length > 0);
+
+    addLog(`Universo: ${cedearList.length} CEDEARs recibidos`, 'ok');
+    document.getElementById('universoCount').textContent = cedearList.length;
+  } catch(e) {
+    addLog('Error cargando lista de CEDEARs: ' + e.message, 'err');
+    toast('Error conectando con BYMA');
+    btn.disabled = false;
+    setProgress(0, 'ERROR', e.message);
+    return;
+  }
+
+  if (cedearList.length === 0) {
+    addLog('Lista vacía — verificá conexión', 'warn');
+    btn.disabled = false;
+    return;
+  }
+
+  // 2 — Procesar cada CEDEAR en lotes para no saturar
+  const LOTE = 4; // concurrencia
+  let procesados = 0;
+  let parciales = []; // CEDEARs que cumplen 3/4 filtros
+
+  setProgress(2, 'ANALIZANDO INDICADORES…', '');
+
+  for (let i = 0; i < cedearList.length; i += LOTE) {
+    const lote = cedearList.slice(i, i + LOTE);
+
+    const promesas = lote.map(c => analizarCedear(c.sym, c.nombre).catch(() => null));
+    const res = await Promise.all(promesas);
+
+    res.forEach(r => {
+      procesados++;
+      if (!r) return;
+
+      if (r.cumplidos === 4) {
+        resultados.push(r);
+        addLog(`✓ SEÑAL COMPLETA: ${r.ticker} | RSI:${r.rsi} ESTO:${r.estoK} MM200:+${r.pctMM}%`, 'ok');
+      } else if (r.cumplidos >= 3) {
+        parciales.push(r);
+        const falta = ['MM200','RSI','VELAS','ESTO'].filter((_,idx) => !r.filtros[idx]).join(', ');
+        addLog(`~ PARCIAL (3/4): ${r.ticker} | Falta: ${falta}`, 'warn');
+      } else {
+        addLog(`✗ ${r.ticker} | cumple ${r.cumplidos}/4`, 'info');
+      }
+    });
+
+    const pct = 2 + (procesados / cedearList.length) * 96;
+    const current = lote.map(c => c.sym).join(', ');
+    setProgress(pct, 'ANALIZANDO…', `${procesados}/${cedearList.length} · Procesando: ${current}`);
+
+    // Actualizar tabla en tiempo real
+    document.getElementById('foundCount').textContent = resultados.length;
+
+    // Pequeña pausa para no saturar la API
+    if (i + LOTE < cedearList.length) {
+      await new Promise(res => setTimeout(res, 120));
+    }
+  }
+
+  // Si no hay señales completas, mostrar las parciales
+  const mostrar = resultados.length > 0 ? resultados : parciales;
+
+  setProgress(100, 'SCAN COMPLETADO', `${resultados.length} señales completas · ${parciales.length} parciales (3/4)`);
+  addLog(`--- FIN DEL SCAN --- Completas: ${resultados.length} | Parciales: ${parciales.length}`, 'ok');
+
+  if (resultados.length === 0 && parciales.length > 0) {
+    addLog('Sin señales 4/4. Mostrando parciales 3/4.', 'warn');
+    document.getElementById('rh-empty').textContent = `Sin señales 4/4 · Mostrando ${parciales.length} con 3/4 filtros`;
+    document.getElementById('rh-count').style.display = 'none';
+  }
+
+  renderResultados(mostrar);
+  toast(`Scan completo · ${resultados.length} señales encontradas`);
+  btn.disabled = false;
+}
+
+// ── EXPORTAR CSV ──────────────────────────────────
+function exportarCSV() {
+  if (resultados.length === 0) { toast('Sin datos para exportar'); return; }
+  const rows = [
+    ['Ticker','Nombre','Último','MM200','Dist MM%','RSI','Esto K','Esto D','Esto Trend','3 Velas Bear','Filtros cumplidos'],
+    ...resultados.map(r => [
+      r.ticker, r.nombre, r.last, r.mm200, r.pctMM, r.rsi, r.estoK, r.estoD,
+      r.estoTrend, r.velasBajistas ? 'SI' : 'NO', r.cumplidos + '/4'
+    ])
+  ];
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type:'text/csv' }));
+  a.download = `cedear_screener_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  toast('CSV exportado');
+}
+</script>
+</body>
+</html>
