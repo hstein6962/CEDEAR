@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CEDEAR Screener · USD · Señal Reversal</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:     #05070d;
+  --s1:     #0d1020;
+  --s2:     #111528;
+  --s3:     #182030;
+  --border: #1e2840;
+  --ink:    #c8d4e8;
+  --muted:  #3d4f6a;
+  --dim:    #232f48;
+  --green:  #00ff88;
+  --red:    #ff2244;
+  --amber:  #ffaa00;
+  --cyan:   #00ccff;
+  --purple: #aa66ff;
+  --white:  #e8f0ff;
+  --gold:   #f0b040;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:'Barlow',sans-serif; font-weight:300;
+  min-height:100vh; overflow-x:hidden;
+}
+body::before{
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,204,255,.01) 3px,rgba(0,204,255,.01) 4px);
+}
+.wrap{max-width:1400px;margin:0 auto;padding:0 20px 80px;position:relative;z-index:1}
+
+/* HERO */
+.hero{padding:36px 0 24px;border-bottom:1px solid var(--border);position:relative}
+.hero-bg{position:absolute;right:-10px;top:0;font-family:'Bebas Neue',sans-serif;font-size:clamp(60px,12vw,130px);color:rgba(0,204,255,.03);pointer-events:none;letter-spacing:4px;line-height:1;user-select:none}
+.hero-tag{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:4px;color:var(--cyan);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:10px}
+.hero-tag::before{content:'';display:block;width:24px;height:1px;background:var(--cyan)}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,7vw,80px);line-height:.95;letter-spacing:2px;color:var(--white);margin-bottom:6px}
+.hero h1 em{color:var(--green);font-style:normal}
+.hero-sub{font-size:13px;color:var(--muted);max-width:620px;line-height:1.6}
+
+/* CHIPS */
+.chips{display:flex;gap:6px;padding:16px 0 0;flex-wrap:wrap}
+.chip{display:flex;align-items:center;gap:7px;padding:6px 12px;border:1px solid var(--border);background:var(--s1);font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);white-space:nowrap}
+.chip .cd{width:6px;height:6px;border-radius:50%}
+.chip.c1.on{border-color:var(--cyan);color:var(--cyan);background:rgba(0,204,255,.05)} .chip.c1 .cd{background:var(--cyan)}
+.chip.c2.on{border-color:var(--amber);color:var(--amber);background:rgba(255,170,0,.05)} .chip.c2 .cd{background:var(--amber)}
+.chip.c3.on{border-color:var(--red);color:var(--red);background:rgba(255,34,68,.05)} .chip.c3 .cd{background:var(--red)}
+.chip.c4.on{border-color:var(--purple);color:var(--purple);background:rgba(170,102,255,.05)} .chip.c4 .cd{background:var(--purple)}
+.chip.c5.on{border-color:var(--gold);color:var(--gold);background:rgba(240,176,64,.05)} .chip.c5 .cd{background:var(--gold)}
+
+/* ACTION BAR */
+.abar{display:flex;align-items:center;gap:10px;padding:16px 0 14px;flex-wrap:wrap}
+.btn-scan{background:var(--green);color:var(--bg);border:none;padding:11px 28px;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:700;transition:all .2s;position:relative;overflow:hidden}
+.btn-scan::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);transform:translateX(-100%);transition:transform .4s}
+.btn-scan:hover::before{transform:translateX(100%)}
+.btn-scan:hover{box-shadow:0 0 24px rgba(0,255,136,.4)}
+.btn-scan:disabled{opacity:.35;cursor:not-allowed}
+.btn-g{background:transparent;border:1px solid var(--border);color:var(--muted);padding:10px 16px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.btn-g:hover{border-color:var(--ink);color:var(--ink)}
+.scan-info{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);margin-left:auto}
+.scan-info em{color:var(--green);font-style:normal}
+
+/* PROGRESS */
+.prog-wrap{background:var(--s1);border:1px solid var(--border);padding:18px 22px;margin:8px 0;display:none}
+.prog-top{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--cyan);margin-bottom:8px;display:flex;justify-content:space-between}
+.prog-bar{height:3px;background:var(--border);overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));width:0%;transition:width .3s;box-shadow:0 0 8px var(--cyan)}
+.prog-det{font-size:11px;color:var(--muted);margin-top:7px;font-family:'Space Mono',monospace;min-height:15px}
+
+/* NOTE */
+.note{background:rgba(240,176,64,.06);border:1px solid rgba(240,176,64,.2);padding:12px 16px;margin:12px 0;font-size:12px;color:rgba(240,176,64,.8);line-height:1.7;font-family:'Space Mono',monospace}
+
+/* CCL BAR */
+.ccl-bar{background:var(--s1);border:1px solid var(--border);border-left:3px solid var(--gold);padding:12px 18px;margin:10px 0;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.ccl-label{font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase}
+.ccl-m{display:flex;flex-direction:column;gap:2px}
+.ccl-m .ml{font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
+.ccl-m .mv{font-size:16px;font-weight:500;color:var(--gold);font-family:'Space Mono',monospace}
+.ccl-m .mv.sm{font-size:13px}
+input.ccl-input{background:rgba(255,255,255,.05);border:none;border-bottom:1px solid var(--border);color:var(--gold);font-family:'Space Mono',monospace;font-size:15px;width:80px;outline:none;padding:0 4px;text-align:center}
+
+/* RESULTS */
+.rh{display:flex;align-items:baseline;gap:12px;margin:24px 0 12px}
+.rh h2{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;color:var(--white)}
+.rh-ct{font-family:'Space Mono',monospace;font-size:12px;color:var(--green)}
+.rh-em{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted)}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead tr{background:var(--s2);border-bottom:1px solid var(--border)}
+th{padding:9px 12px;text-align:left;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;white-space:nowrap;cursor:pointer;user-select:none;transition:color .15s}
+th:hover{color:var(--ink)}
+th.sa::after{content:' ↑';color:var(--green)}
+th.sd::after{content:' ↓';color:var(--green)}
+tbody tr{border-bottom:1px solid rgba(30,40,64,.7);transition:background .12s;animation:fadeR .35s ease both}
+@keyframes fadeR{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+tbody tr:hover{background:rgba(0,204,255,.025)}
+td{padding:11px 12px;vertical-align:middle;white-space:nowrap}
+
+/* CELL TYPES */
+.td-tk{display:flex;flex-direction:column;gap:2px}
+.td-sym{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--white)}
+.td-nm{font-size:11px;color:var(--muted);max-width:130px;overflow:hidden;text-overflow:ellipsis}
+.td-src{font-size:9px;letter-spacing:1px;color:var(--dim);margin-top:1px}
+
+.ind{display:flex;flex-direction:column;gap:2px;align-items:flex-end}
+.ind-v{font-family:'Space Mono',monospace;font-size:13px}
+.ind-bar{width:56px;height:3px;background:var(--dim);overflow:hidden}
+.ind-fill{height:100%}
+
+.vcell{display:flex;gap:3px;align-items:flex-end}
+.vela{width:9px;border-radius:1px}
+.vela.b{background:var(--red);opacity:.85}
+.vela.u{background:var(--green);opacity:.85}
+.vela.d{background:var(--muted)}
+
+.sig{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;font-weight:700}
+.sig.full{background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.35);color:var(--green);box-shadow:0 0 10px rgba(0,255,136,.12)}
+.sig.part{background:rgba(255,170,0,.08);border:1px solid rgba(255,170,0,.25);color:var(--amber)}
+.sig::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;animation:bl 1.5s infinite}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.3}}
+
+.mc{display:flex;align-items:flex-end;gap:2px;height:28px}
+.mb{width:6px;border-radius:1px 1px 0 0}
+.mb.u{background:var(--green);opacity:.65}
+.mb.d{background:var(--red);opacity:.65}
+
+/* EMPTY */
+.empty{text-align:center;padding:56px 20px;font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:2px;border:1px dashed var(--border)}
+.empty .eb{font-family:'Bebas Neue',sans-serif;font-size:44px;color:var(--dim);display:block;margin-bottom:10px;letter-spacing:3px}
+
+/* LOG */
+.log-toggle{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:8px;padding:10px 0;user-select:none;margin-top:24px}
+.log-toggle:hover{color:var(--ink)}
+.log-box{background:var(--s1);border:1px solid var(--border);max-height:200px;overflow-y:auto;padding:12px;font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);line-height:1.9;display:none}
+.log-box .ok{color:var(--green)} .log-box .er{color:var(--red)} .log-box .wa{color:var(--amber)} .log-box .in{color:var(--cyan)}
+
+/* TOAST */
+.toast{position:fixed;bottom:18px;right:18px;background:var(--green);color:var(--bg);padding:9px 16px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+
+@media(max-width:700px){
+  .hero h1{font-size:44px} .hero-bg{display:none}
+  td,th{padding:9px 9px} .td-nm,.td-src{display:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="hero-bg">SCREENER USD</div>
+  <div class="hero-tag">BYMA · USD · SEÑAL REVERSAL · FINES DE SEMANA</div>
+  <h1>CEDEAR SCREENER<br><em>EN DÓLARES</em></h1>
+  <p class="hero-sub">Precios históricos en USD desde Stooq · Análisis técnico independiente del horario de BYMA · Usable fines de semana y feriados.</p>
+  <div class="chips">
+    <div class="chip c1 on"><div class="cd"></div>MM200: PRECIO ARRIBA</div>
+    <div class="chip c2 on"><div class="cd"></div>RSI: 20–30</div>
+    <div class="chip c3 on"><div class="cd"></div>3 VELAS BAJISTAS</div>
+    <div class="chip c4 on"><div class="cd"></div>ESTOCÁSTICO 15–25 ↑</div>
+    <div class="chip c5 on"><div class="cd"></div>PRECIO EN USD</div>
+  </div>
+</div>
+
+<!-- CCL BAR -->
+<div class="ccl-bar">
+  <span class="ccl-label">CCL del día (AL30/AL30C)</span>
+  <div class="ccl-m">
+    <span class="ml">CCL ARS/$</span>
+    <span class="mv">
+      $<input type="number" class="ccl-input" id="cclInput" value="1486" step="1" min="1">
+    </span>
+  </div>
+  <div class="ccl-m">
+    <span class="ml">Tolerancia desarbitraje</span>
+    <span class="mv sm">±<input type="number" class="ccl-input" id="tolInput" value="3" step="0.5" min="0.5" max="15" style="width:44px">%</span>
+  </div>
+  <div style="font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;margin-left:auto">
+    Precio USD Stooq → × CCL = Precio ARS teórico<br>
+    <span style="color:var(--dim)">Diferencia vs BYMA = desarbitraje</span>
+  </div>
+</div>
+
+<div class="note">
+  ⚡ Fuente USD: <strong>Stooq.com</strong> (histórico EOD gratuito, sin API key) · Formato: AAPL.US, PBR.US, PETR3.SA (Brasil)<br>
+  Funciona fuera de horario BYMA · Los indicadores se calculan sobre la serie en USD del subyacente original.
+</div>
+
+<!-- ACTION BAR -->
+<div class="abar">
+  <button class="btn-scan" id="btnScan" onclick="iniciarScan()">▶ INICIAR SCAN</button>
+  <button class="btn-g" onclick="exportCSV()">↓ CSV</button>
+  <button class="btn-g" onclick="toggleLog()">LOG</button>
+  <div class="scan-info">Universo: <em id="uCount">50</em> CEDEARs · Señales: <em id="fCount">—</em></div>
+</div>
+
+<!-- PROGRESS -->
+<div class="prog-wrap" id="progWrap">
+  <div class="prog-top"><span id="progLbl">ESCANEANDO…</span><span id="progPct">0%</span></div>
+  <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+  <div class="prog-det" id="progDet">Iniciando…</div>
+</div>
+
+<!-- RESULTS -->
+<div class="rh">
+  <h2>SEÑALES</h2>
+  <span class="rh-ct" id="rhCt" style="display:none"></span>
+  <span class="rh-em" id="rhEm">Presioná INICIAR SCAN</span>
+</div>
+
+<div class="tbl-wrap">
+  <div id="tableArea">
+    <div class="empty">
+      <span class="eb">USD</span>
+      El screener descarga histórico en dólares desde Stooq<br>
+      y calcula MM200 · RSI · Velas · Estocástico en USD
+    </div>
+  </div>
+</div>
+
+<div class="log-toggle" onclick="toggleLog()">
+  <span id="logArr">▶</span> LOG DE PROCESAMIENTO <span id="logCt" style="color:var(--green)"></span>
+</div>
+<div class="log-box" id="logBox"></div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════
+//  TOP 50 CEDEARs más operados — ticker Stooq
+//  Formato: TICKER.US para NYSE/Nasdaq
+//           TICKER.SA para Bovespa (Brasil)
+// ══════════════════════════════════════════════
+const UNIVERSE = [
+  // TECH US
+  {sym:'AAPL',  stooq:'AAPL.US',  ratio:20,  name:'Apple Inc.'},
+  {sym:'NVDA',  stooq:'NVDA.US',  ratio:10,  name:'Nvidia Corp.'},
+  {sym:'MSFT',  stooq:'MSFT.US',  ratio:30,  name:'Microsoft'},
+  {sym:'AMZN',  stooq:'AMZN.US',  ratio:144, name:'Amazon'},
+  {sym:'GOOGL', stooq:'GOOGL.US', ratio:32,  name:'Alphabet'},
+  {sym:'META',  stooq:'META.US',  ratio:20,  name:'Meta Platforms'},
+  {sym:'TSLA',  stooq:'TSLA.US',  ratio:15,  name:'Tesla'},
+  {sym:'NFLX',  stooq:'NFLX.US',  ratio:90,  name:'Netflix'},
+  {sym:'AMD',   stooq:'AMD.US',   ratio:5,   name:'AMD'},
+  {sym:'INTC',  stooq:'INTC.US',  ratio:5,   name:'Intel'},
+  // FINANCE US
+  {sym:'JPM',   stooq:'JPM.US',   ratio:8,   name:'JPMorgan Chase'},
+  {sym:'BAC',   stooq:'BAC.US',   ratio:3,   name:'Bank of America'},
+  {sym:'GS',    stooq:'GS.US',    ratio:20,  name:'Goldman Sachs'},
+  {sym:'BRK/B', stooq:'BRK-B.US', ratio:10,  name:'Berkshire Hathaway B'},
+  {sym:'V',     stooq:'V.US',     ratio:10,  name:'Visa'},
+  {sym:'MA',    stooq:'MA.US',    ratio:18,  name:'Mastercard'},
+  // ENERGY
+  {sym:'XOM',   stooq:'XOM.US',   ratio:8,   name:'ExxonMobil'},
+  {sym:'CVX',   stooq:'CVX.US',   ratio:8,   name:'Chevron'},
+  {sym:'PBR',   stooq:'PBR.US',   ratio:6,   name:'Petrobras ADR'},
+  // BRASIL
+  {sym:'PETR3', stooq:'PETR3.SA', ratio:2,   name:'Petrobras ON (BRL)'},
+  {sym:'VALE3', stooq:'VALE3.SA', ratio:4,   name:'Vale ON (BRL)'},
+  // CONSUMER
+  {sym:'KO',    stooq:'KO.US',    ratio:6,   name:'Coca-Cola'},
+  {sym:'PEP',   stooq:'PEP.US',   ratio:12,  name:'PepsiCo'},
+  {sym:'MCD',   stooq:'MCD.US',   ratio:25,  name:'McDonald\'s'},
+  {sym:'DIS',   stooq:'DIS.US',   ratio:10,  name:'Disney'},
+  {sym:'NKE',   stooq:'NKE.US',   ratio:5,   name:'Nike'},
+  // LATAM
+  {sym:'MELI',  stooq:'MELI.US',  ratio:120, name:'MercadoLibre'},
+  // ETFs
+  {sym:'SPY',   stooq:'SPY.US',   ratio:25,  name:'SPDR S&P 500'},
+  {sym:'QQQ',   stooq:'QQQ.US',   ratio:20,  name:'Invesco QQQ'},
+  {sym:'GLD',   stooq:'GLD.US',   ratio:10,  name:'SPDR Gold'},
+  // HEALTH
+  {sym:'JNJ',   stooq:'JNJ.US',   ratio:12,  name:'Johnson & Johnson'},
+  {sym:'PFE',   stooq:'PFE.US',   ratio:4,   name:'Pfizer'},
+  {sym:'ABBV',  stooq:'ABBV.US',  ratio:12,  name:'AbbVie'},
+  {sym:'LLY',   stooq:'LLY.US',   ratio:100, name:'Eli Lilly'},
+  {sym:'MRK',   stooq:'MRK.US',   ratio:10,  name:'Merck'},
+  // INDUSTRIAL
+  {sym:'BA',    stooq:'BA.US',    ratio:40,  name:'Boeing'},
+  {sym:'CAT',   stooq:'CAT.US',   ratio:25,  name:'Caterpillar'},
+  {sym:'GE',    stooq:'GE.US',    ratio:10,  name:'GE Aerospace'},
+  {sym:'HON',   stooq:'HON.US',   ratio:20,  name:'Honeywell'},
+  // MATERIALS
+  {sym:'VALE',  stooq:'VALE.US',  ratio:4,   name:'Vale ADR (USD)'},
+  {sym:'FCX',   stooq:'FCX.US',   ratio:5,   name:'Freeport-McMoRan'},
+  // SEMI
+  {sym:'AVGO',  stooq:'AVGO.US',  ratio:30,  name:'Broadcom'},
+  {sym:'QCOM',  stooq:'QCOM.US',  ratio:10,  name:'Qualcomm'},
+  {sym:'MU',    stooq:'MU.US',    ratio:6,   name:'Micron'},
+  {sym:'ASML',  stooq:'ASML.US',  ratio:50,  name:'ASML Holding'},
+  // CLOUD / SOFTWARE
+  {sym:'CRM',   stooq:'CRM.US',   ratio:20,  name:'Salesforce'},
+  {sym:'ADBE',  stooq:'ADBE.US',  ratio:45,  name:'Adobe'},
+  {sym:'NOW',   stooq:'NOW.US',   ratio:50,  name:'ServiceNow'},
+  {sym:'ORCL',  stooq:'ORCL.US',  ratio:10,  name:'Oracle'},
+  {sym:'PYPL',  stooq:'PYPL.US',  ratio:6,   name:'PayPal'},
+];
+
+// ── ESTADO ───────────────────────────────────
+let resultados = [];
+let parciales  = [];
+let sortCol = 'rsi', sortDir = 'asc';
+let logLines = [];
+
+// ── PROXY CORS ────────────────────────────────
+// allorigins.win como proxy para Stooq (CORS bloqueado en browser directo)
+const PROXY = 'https://api.allorigins.win/raw?url=';
+const STOOQ = 'https://stooq.com/q/d/l/?s=';
+
+// ── HELPERS ───────────────────────────────────
+function log(msg, type='in') {
+  logLines.push({msg,type});
+  const box = document.getElementById('logBox');
+  const d = document.createElement('div');
+  d.className = type;
+  const ts = new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  d.textContent = `[${ts}] ${msg}`;
+  box.appendChild(d);
+  box.scrollTop = box.scrollHeight;
+  document.getElementById('logCt').textContent = `(${logLines.length})`;
+}
+
+function toggleLog() {
+  const b = document.getElementById('logBox');
+  const a = document.getElementById('logArr');
+  const show = b.style.display !== 'block';
+  b.style.display = show ? 'block' : 'none';
+  a.textContent = show ? '▼' : '▶';
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2600);
+}
+
+function setProgress(pct, lbl, det) {
+  document.getElementById('progFill').style.width = pct+'%';
+  document.getElementById('progPct').textContent = Math.round(pct)+'%';
+  if(lbl) document.getElementById('progLbl').textContent = lbl;
+  if(det) document.getElementById('progDet').textContent = det;
+}
+
+// ── FETCH STOOQ CSV ───────────────────────────
+async function fetchStooqCSV(stooqSym) {
+  // Fecha: últimos 400 días
+  const now = new Date();
+  const d2 = now.toISOString().split('T')[0].replace(/-/g,'');
+  const past = new Date(now - 400*86400000);
+  const d1 = past.toISOString().split('T')[0].replace(/-/g,'');
+
+  const url = `${STOOQ}${encodeURIComponent(stooqSym)}&d1=${d1}&d2=${d2}&i=d`;
+  const proxied = PROXY + encodeURIComponent(url);
+
+  const r = await fetch(proxied, { signal: AbortSignal.timeout(12000) });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  const text = await r.text();
+
+  // Parsear CSV: Date,Open,High,Low,Close,Volume
+  const lines = text.trim().split('\n');
+  if (lines.length < 3) throw new Error('Sin datos suficientes');
+
+  const candles = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(',');
+    if (cols.length < 5) continue;
+    const close = parseFloat(cols[4]);
+    const open  = parseFloat(cols[1]);
+    const high  = parseFloat(cols[2]);
+    const low   = parseFloat(cols[3]);
+    if (!close || isNaN(close)) continue;
+    candles.push({ date:cols[0], open, high, low, close });
+  }
+
+  // Stooq devuelve orden descendente — invertir
+  candles.reverse();
+  return candles;
+}
+
+// ── INDICADORES ───────────────────────────────
+function calcMM(closes, n) {
+  if (closes.length < n) return null;
+  const sl = closes.slice(-n);
+  return sl.reduce((a,b)=>a+b,0)/n;
+}
+
+function calcRSI(closes, n=14) {
+  if (closes.length < n+1) return null;
+  const sl = closes.slice(-(n+1));
+  let g=0, l=0;
+  for (let i=1;i<sl.length;i++) {
+    const d = sl[i]-sl[i-1];
+    if(d>0) g+=d; else l-=d;
+  }
+  const ag=g/n, al=l/n;
+  if(al===0) return 100;
+  return 100-100/(1+ag/al);
+}
+
+function calcEsto(candles, kP=14, dP=3) {
+  if (candles.length < kP+dP) return {k:null,d:null,trend:null};
+  const kVals=[];
+  for(let i=candles.length-dP;i<candles.length;i++) {
+    const win=candles.slice(i-kP+1,i+1);
+    const hi=Math.max(...win.map(c=>c.high));
+    const lo=Math.min(...win.map(c=>c.low));
+    const cl=candles[i].close;
+    kVals.push(hi===lo ? 50 : ((cl-lo)/(hi-lo))*100);
+  }
+  const k=kVals[kVals.length-1];
+  const d=kVals.reduce((a,b)=>a+b,0)/kVals.length;
+  const trend=kVals.length>=2?(kVals[kVals.length-1]>kVals[kVals.length-2]?'up':'down'):null;
+  return {k,d,trend};
+}
+
+function check3Bears(candles) {
+  if(candles.length<3) return false;
+  return candles.slice(-3).every(c=>c.close<c.open);
+}
+
+// ── ANALIZAR ──────────────────────────────────
+async function analizar(item) {
+  let candles;
+  try {
+    candles = await fetchStooqCSV(item.stooq);
+  } catch(e) {
+    log(`✗ ${item.sym} (${item.stooq}): ${e.message}`, 'er');
+    return null;
+  }
+
+  if (candles.length < 50) {
+    log(`✗ ${item.sym}: solo ${candles.length} velas — insuficiente`, 'wa');
+    return null;
+  }
+
+  const closes = candles.map(c=>c.close);
+  const last   = closes[closes.length-1];
+
+  const mm200    = calcMM(closes, 200);
+  if (!mm200) { log(`✗ ${item.sym}: sin MM200 (${candles.length} velas)`, 'wa'); return null; }
+
+  const sobreMM  = last > mm200;
+  const rsi      = calcRSI(closes, 14);
+  const rsiOk    = rsi!==null && rsi>=20 && rsi<=30;
+  const bears    = check3Bears(candles);
+  const esto     = calcEsto(candles, 14, 3);
+  const estoOk   = esto.k!==null && esto.k>=15 && esto.k<=25 && esto.trend==='up';
+
+  const filtros  = [sobreMM, rsiOk, bears, estoOk];
+  const cumple   = filtros.filter(Boolean).length;
+  const pctMM    = mm200 ? (((last-mm200)/mm200)*100).toFixed(2) : null;
+
+  return {
+    ...item, last, mm200: mm200?.toFixed(3), sobreMM, rsi: rsi?.toFixed(1),
+    rsiOk, bears, esto, estoOk, estoK: esto.k?.toFixed(1), estoD: esto.d?.toFixed(1),
+    filtros, cumple, pctMM,
+    candles: candles.slice(-20),
+    last3:   candles.slice(-3),
+  };
+}
+
+// ── SCAN PRINCIPAL ────────────────────────────
+async function iniciarScan() {
+  const btn = document.getElementById('btnScan');
+  btn.disabled = true;
+  resultados = []; parciales = []; logLines = [];
+  document.getElementById('logBox').innerHTML = '';
+  document.getElementById('progWrap').style.display = 'block';
+  document.getElementById('rhEm').textContent = 'Escaneando…';
+  document.getElementById('rhCt').style.display = 'none';
+  document.getElementById('tableArea').innerHTML =
+    '<div class="empty"><span class="eb" style="animation:bl 1s infinite">…</span>Descargando histórico USD desde Stooq</div>';
+
+  log('=== INICIO SCAN CEDEAR USD ===', 'in');
+  log(`Universo: ${UNIVERSE.length} CEDEARs · Fuente: Stooq.com`, 'in');
+
+  const LOTE = 3;
+  let proc = 0;
+
+  for (let i=0; i<UNIVERSE.length; i+=LOTE) {
+    const lote = UNIVERSE.slice(i, i+LOTE);
+    const res = await Promise.all(lote.map(c=>analizar(c).catch(()=>null)));
+
+    res.forEach(r => {
+      proc++;
+      if (!r) return;
+      if (r.cumple===4) {
+        resultados.push(r);
+        log(`★ SEÑAL COMPLETA: ${r.sym} | USD:$${r.last} MM200:${r.pctMM>0?'+':''}${r.pctMM}% RSI:${r.rsi} K:${r.estoK}`, 'ok');
+      } else if (r.cumple>=3) {
+        parciales.push(r);
+        const falta = ['MM200','RSI','VELAS','ESTO'].filter((_,j)=>!r.filtros[j]).join(', ');
+        log(`~ PARCIAL (${r.cumple}/4): ${r.sym} | Falta: ${falta}`, 'wa');
+      } else {
+        log(`✗ ${r.sym} | ${r.cumple}/4 | RSI:${r.rsi} K:${r.estoK} MM:${r.pctMM}%`, 'in');
+      }
+    });
+
+    document.getElementById('fCount').textContent = resultados.length;
+    const pct = 2 + (proc/UNIVERSE.length)*96;
+    setProgress(pct, 'ANALIZANDO USD…', `${proc}/${UNIVERSE.length} · ${lote.map(c=>c.sym).join(', ')}`);
+
+    if (i+LOTE < UNIVERSE.length) await new Promise(r=>setTimeout(r,200));
+  }
+
+  setProgress(100, 'COMPLETADO', `${resultados.length} señales completas · ${parciales.length} parciales`);
+  log(`=== FIN: ${resultados.length} completas · ${parciales.length} parciales ===`, 'ok');
+
+  const mostrar = resultados.length>0 ? resultados : parciales;
+  if (resultados.length===0 && parciales.length>0) {
+    document.getElementById('rhEm').textContent = `Sin señales 4/4 · Mostrando ${parciales.length} con 3/4 filtros`;
+  }
+
+  renderTabla(mostrar);
+  toast(`Scan completo · ${resultados.length} señales USD`);
+  btn.disabled = false;
+}
+
+// ── RENDER ────────────────────────────────────
+function renderTabla(items) {
+  if (!items.length) {
+    document.getElementById('tableArea').innerHTML =
+      '<div class="empty"><span class="eb">0</span>Sin señales con los 4 filtros · Revisá el log</div>';
+    return;
+  }
+
+  document.getElementById('rhCt').style.display = 'inline';
+  document.getElementById('rhCt').textContent = `${items.length} señal${items.length>1?'es':''} · en USD`;
+  document.getElementById('rhEm').textContent = '';
+
+  const sorted = [...items].sort((a,b)=>{
+    const va = parseFloat(a[sortCol])||0;
+    const vb = parseFloat(b[sortCol])||0;
+    return sortDir==='asc'?va-vb:vb-va;
+  });
+
+  document.getElementById('tableArea').innerHTML = `
+  <table>
+    <thead><tr>
+      <th onclick="sortBy('sym')">CEDEAR</th>
+      <th onclick="sortBy('last')">USD ÚLTIMO</th>
+      <th onclick="sortBy('pctMM')">vs MM200</th>
+      <th onclick="sortBy('rsi')">RSI</th>
+      <th>ÚLTIMAS 3</th>
+      <th onclick="sortBy('estoK')">ESTO K</th>
+      <th onclick="sortBy('estoD')">ESTO D</th>
+      <th>TENDENCIA</th>
+      <th>SEÑAL</th>
+      <th>ÚLTIMAS 20</th>
+    </tr></thead>
+    <tbody>${sorted.map((r,i)=>fila(r,i)).join('')}</tbody>
+  </table>`;
+
+  document.querySelectorAll('th').forEach(th=>{th.classList.remove('sa','sd')});
+}
+
+function fila(r, i) {
+  const sc = r.cumple===4?'full':'part';
+  const st = r.cumple===4?'★ SEÑAL 4/4':`${r.cumple}/4 FILTROS`;
+  const rc = r.rsiOk?'c-amber':parseFloat(r.rsi)<20?'c-red':'c-muted';
+  const ec = r.estoOk?'c-purple':'c-muted';
+  const mc = r.sobreMM?'c-green':'c-red';
+  const sign = parseFloat(r.pctMM)>=0?'+':'';
+
+  // Mini chart
+  const mx = Math.max(...r.candles.map(c=>c.close));
+  const mn = Math.min(...r.candles.map(c=>c.close));
+  const rng = mx-mn||1;
+  const mini = r.candles.map(c=>{
+    const h = Math.max(4,((c.close-mn)/rng)*26);
+    return `<div class="mb ${c.close>=c.open?'u':'d'}" style="height:${h.toFixed(0)}px"></div>`;
+  }).join('');
+
+  // 3 velas
+  const v3 = r.last3.map(c=>{
+    const h = Math.max(10,Math.abs(c.close-c.open)/c.close*350+10);
+    const cls = c.close<c.open?'b':c.close>c.open?'u':'d';
+    return `<div class="vela ${cls}" style="height:${Math.min(h,26)}px"></div>`;
+  }).join('');
+
+  return `
+  <tr style="animation-delay:${i*35}ms">
+    <td><div class="td-tk">
+      <span class="td-sym">${r.sym}</span>
+      <span class="td-nm">${r.name}</span>
+      <span class="td-src">${r.stooq}</span>
+    </div></td>
+    <td style="font-family:'Space Mono',monospace;font-size:14px;color:var(--white)">
+      $${Number(r.last).toFixed(2)}
+    </td>
+    <td><div class="ind">
+      <span class="${mc}" style="font-family:'Space Mono',monospace;font-size:12px">${sign}${r.pctMM}%</span>
+      <span style="font-size:10px;color:var(--muted)">MM:$${Number(r.mm200).toFixed(2)}</span>
+    </div></td>
+    <td><div class="ind">
+      <span class="${rc}" style="font-family:'Space Mono',monospace;font-size:14px;font-weight:700">${r.rsi}</span>
+      <div class="ind-bar"><div class="ind-fill" style="width:${r.rsi}%;background:${r.rsiOk?'var(--amber)':'var(--muted)'}"></div></div>
+    </div></td>
+    <td><div class="vcell">${v3}</div>
+      <div style="font-size:9px;color:${r.bears?'var(--red)':'var(--muted)'};margin-top:3px;font-family:'Space Mono',monospace">
+        ${r.bears?'✓ 3 BEAR':'✗ NO'}
+      </div>
+    </td>
+    <td><div class="ind">
+      <span class="${ec}" style="font-family:'Space Mono',monospace;font-size:14px;font-weight:700">${r.estoK}</span>
+      <div class="ind-bar"><div class="ind-fill" style="width:${r.estoK}%;background:${r.estoOk?'var(--purple)':'var(--muted)'}"></div></div>
+    </div></td>
+    <td class="${ec}" style="font-family:'Space Mono',monospace;font-size:12px">${r.estoD}</td>
+    <td style="font-family:'Space Mono',monospace;font-size:11px;color:${r.esto.trend==='up'?'var(--green)':'var(--muted)'}">
+      ${r.esto.trend==='up'?'↑ GIRANDO':'↓ BAJA'}
+    </td>
+    <td><span class="sig ${sc}">${st}</span></td>
+    <td><div class="mc">${mini}</div></td>
+  </tr>`;
+}
+
+function sortBy(col) {
+  if(sortCol===col) sortDir=sortDir==='asc'?'desc':'asc';
+  else{sortCol=col;sortDir='asc';}
+  const mostrar = resultados.length>0?resultados:parciales;
+  renderTabla(mostrar);
+}
+
+// ── EXPORT ────────────────────────────────────
+function exportCSV() {
+  const data = resultados.length>0?resultados:parciales;
+  if(!data.length){toast('Sin datos');return;}
+  const rows=[
+    ['CEDEAR','Nombre','Stooq','USD Último','vs MM200%','MM200','RSI','Esto K','Esto D','Trend','3 Bears','Filtros'],
+    ...data.map(r=>[r.sym,r.name,r.stooq,r.last,r.pctMM,r.mm200,r.rsi,r.estoK,r.estoD,r.esto.trend,r.bears?'SI':'NO',r.cumple+'/4'])
+  ];
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([rows.map(r=>r.join(',')).join('\n')],{type:'text/csv'}));
+  a.download=`screener_usd_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  toast('CSV exportado');
+}
+</script>
+</body>
+</html>
