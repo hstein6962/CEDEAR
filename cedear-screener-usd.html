@@ -3,39 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CEDEAR Screener · USD · Señal Reversal</title>
+<title>CEDEAR Screener USD · BYMA Completo</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:     #05070d;
-  --s1:     #0d1020;
-  --s2:     #111528;
-  --s3:     #182030;
-  --border: #1e2840;
-  --ink:    #c8d4e8;
-  --muted:  #3d4f6a;
-  --dim:    #232f48;
-  --green:  #00ff88;
-  --red:    #ff2244;
-  --amber:  #ffaa00;
-  --cyan:   #00ccff;
-  --purple: #aa66ff;
-  --white:  #e8f0ff;
-  --gold:   #f0b040;
+  --bg:#05070d; --s1:#0d1020; --s2:#111528; --s3:#182030;
+  --border:#1e2840; --ink:#c8d4e8; --muted:#3d4f6a; --dim:#232f48;
+  --green:#00ff88; --red:#ff2244; --amber:#ffaa00;
+  --cyan:#00ccff; --purple:#aa66ff; --white:#e8f0ff; --gold:#f0b040;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{
-  background:var(--bg); color:var(--ink);
-  font-family:'Barlow',sans-serif; font-weight:300;
-  min-height:100vh; overflow-x:hidden;
-}
-body::before{
-  content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
-  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,204,255,.01) 3px,rgba(0,204,255,.01) 4px);
-}
+body{background:var(--bg);color:var(--ink);font-family:'Barlow',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,204,255,.01) 3px,rgba(0,204,255,.01) 4px)}
 .wrap{max-width:1400px;margin:0 auto;padding:0 20px 80px;position:relative;z-index:1}
-
-/* HERO */
 .hero{padding:36px 0 24px;border-bottom:1px solid var(--border);position:relative}
 .hero-bg{position:absolute;right:-10px;top:0;font-family:'Bebas Neue',sans-serif;font-size:clamp(60px,12vw,130px);color:rgba(0,204,255,.03);pointer-events:none;letter-spacing:4px;line-height:1;user-select:none}
 .hero-tag{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:4px;color:var(--cyan);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:10px}
@@ -43,172 +23,104 @@ body::before{
 .hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,7vw,80px);line-height:.95;letter-spacing:2px;color:var(--white);margin-bottom:6px}
 .hero h1 em{color:var(--green);font-style:normal}
 .hero-sub{font-size:13px;color:var(--muted);max-width:620px;line-height:1.6}
-
-/* CHIPS */
 .chips{display:flex;gap:6px;padding:16px 0 0;flex-wrap:wrap}
-.chip{display:flex;align-items:center;gap:7px;padding:6px 12px;border:1px solid var(--border);background:var(--s1);font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);white-space:nowrap}
+.chip{display:flex;align-items:center;gap:7px;padding:6px 12px;border:1px solid var(--border);background:var(--s1);font-family:'Space Mono',monospace;font-size:10px;white-space:nowrap}
 .chip .cd{width:6px;height:6px;border-radius:50%}
-.chip.c1.on{border-color:var(--cyan);color:var(--cyan);background:rgba(0,204,255,.05)} .chip.c1 .cd{background:var(--cyan)}
-.chip.c2.on{border-color:var(--amber);color:var(--amber);background:rgba(255,170,0,.05)} .chip.c2 .cd{background:var(--amber)}
-.chip.c3.on{border-color:var(--red);color:var(--red);background:rgba(255,34,68,.05)} .chip.c3 .cd{background:var(--red)}
-.chip.c4.on{border-color:var(--purple);color:var(--purple);background:rgba(170,102,255,.05)} .chip.c4 .cd{background:var(--purple)}
-.chip.c5.on{border-color:var(--gold);color:var(--gold);background:rgba(240,176,64,.05)} .chip.c5 .cd{background:var(--gold)}
-
-/* ACTION BAR */
+.chip.c1{border-color:var(--amber);color:var(--amber);background:rgba(255,170,0,.05)} .chip.c1 .cd{background:var(--amber)}
+.chip.c2{border-color:var(--red);color:var(--red);background:rgba(255,34,68,.05)} .chip.c2 .cd{background:var(--red)}
+.chip.c3{border-color:var(--purple);color:var(--purple);background:rgba(170,102,255,.05)} .chip.c3 .cd{background:var(--purple)}
+.chip.c4{border-color:var(--gold);color:var(--gold);background:rgba(240,176,64,.05)} .chip.c4 .cd{background:var(--gold)}
+.note{background:rgba(240,176,64,.06);border:1px solid rgba(240,176,64,.2);padding:12px 16px;margin:14px 0;font-size:12px;color:rgba(240,176,64,.8);line-height:1.7;font-family:'Space Mono',monospace}
 .abar{display:flex;align-items:center;gap:10px;padding:16px 0 14px;flex-wrap:wrap}
-.btn-scan{background:var(--green);color:var(--bg);border:none;padding:11px 28px;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:700;transition:all .2s;position:relative;overflow:hidden}
-.btn-scan::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);transform:translateX(-100%);transition:transform .4s}
-.btn-scan:hover::before{transform:translateX(100%)}
+.btn-scan{background:var(--green);color:var(--bg);border:none;padding:11px 28px;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:700;transition:all .2s}
 .btn-scan:hover{box-shadow:0 0 24px rgba(0,255,136,.4)}
 .btn-scan:disabled{opacity:.35;cursor:not-allowed}
 .btn-g{background:transparent;border:1px solid var(--border);color:var(--muted);padding:10px 16px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s}
 .btn-g:hover{border-color:var(--ink);color:var(--ink)}
 .scan-info{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);margin-left:auto}
 .scan-info em{color:var(--green);font-style:normal}
-
-/* PROGRESS */
 .prog-wrap{background:var(--s1);border:1px solid var(--border);padding:18px 22px;margin:8px 0;display:none}
 .prog-top{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--cyan);margin-bottom:8px;display:flex;justify-content:space-between}
 .prog-bar{height:3px;background:var(--border);overflow:hidden}
 .prog-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));width:0%;transition:width .3s;box-shadow:0 0 8px var(--cyan)}
 .prog-det{font-size:11px;color:var(--muted);margin-top:7px;font-family:'Space Mono',monospace;min-height:15px}
-
-/* NOTE */
-.note{background:rgba(240,176,64,.06);border:1px solid rgba(240,176,64,.2);padding:12px 16px;margin:12px 0;font-size:12px;color:rgba(240,176,64,.8);line-height:1.7;font-family:'Space Mono',monospace}
-
-/* CCL BAR */
-.ccl-bar{background:var(--s1);border:1px solid var(--border);border-left:3px solid var(--gold);padding:12px 18px;margin:10px 0;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
-.ccl-label{font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase}
-.ccl-m{display:flex;flex-direction:column;gap:2px}
-.ccl-m .ml{font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
-.ccl-m .mv{font-size:16px;font-weight:500;color:var(--gold);font-family:'Space Mono',monospace}
-.ccl-m .mv.sm{font-size:13px}
-input.ccl-input{background:rgba(255,255,255,.05);border:none;border-bottom:1px solid var(--border);color:var(--gold);font-family:'Space Mono',monospace;font-size:15px;width:80px;outline:none;padding:0 4px;text-align:center}
-
-/* RESULTS */
 .rh{display:flex;align-items:baseline;gap:12px;margin:24px 0 12px}
 .rh h2{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;color:var(--white)}
 .rh-ct{font-family:'Space Mono',monospace;font-size:12px;color:var(--green)}
 .rh-em{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted)}
-
-/* TABLE */
 .tbl-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse}
 thead tr{background:var(--s2);border-bottom:1px solid var(--border)}
 th{padding:9px 12px;text-align:left;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;white-space:nowrap;cursor:pointer;user-select:none;transition:color .15s}
 th:hover{color:var(--ink)}
-th.sa::after{content:' ↑';color:var(--green)}
-th.sd::after{content:' ↓';color:var(--green)}
+th.sa::after{content:' ↑';color:var(--green)} th.sd::after{content:' ↓';color:var(--green)}
 tbody tr{border-bottom:1px solid rgba(30,40,64,.7);transition:background .12s;animation:fadeR .35s ease both}
 @keyframes fadeR{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 tbody tr:hover{background:rgba(0,204,255,.025)}
 td{padding:11px 12px;vertical-align:middle;white-space:nowrap}
-
-/* CELL TYPES */
 .td-tk{display:flex;flex-direction:column;gap:2px}
 .td-sym{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--white)}
-.td-nm{font-size:11px;color:var(--muted);max-width:130px;overflow:hidden;text-overflow:ellipsis}
+.td-nm{font-size:11px;color:var(--muted);max-width:140px;overflow:hidden;text-overflow:ellipsis}
 .td-src{font-size:9px;letter-spacing:1px;color:var(--dim);margin-top:1px}
-
 .ind{display:flex;flex-direction:column;gap:2px;align-items:flex-end}
-.ind-v{font-family:'Space Mono',monospace;font-size:13px}
 .ind-bar{width:56px;height:3px;background:var(--dim);overflow:hidden}
 .ind-fill{height:100%}
-
 .vcell{display:flex;gap:3px;align-items:flex-end}
 .vela{width:9px;border-radius:1px}
-.vela.b{background:var(--red);opacity:.85}
-.vela.u{background:var(--green);opacity:.85}
-.vela.d{background:var(--muted)}
-
+.vela.b{background:var(--red);opacity:.85} .vela.u{background:var(--green);opacity:.85} .vela.d{background:var(--muted)}
 .sig{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;font-weight:700}
 .sig.full{background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.35);color:var(--green);box-shadow:0 0 10px rgba(0,255,136,.12)}
 .sig.part{background:rgba(255,170,0,.08);border:1px solid rgba(255,170,0,.25);color:var(--amber)}
 .sig::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;animation:bl 1.5s infinite}
 @keyframes bl{0%,100%{opacity:1}50%{opacity:.3}}
-
 .mc{display:flex;align-items:flex-end;gap:2px;height:28px}
 .mb{width:6px;border-radius:1px 1px 0 0}
-.mb.u{background:var(--green);opacity:.65}
-.mb.d{background:var(--red);opacity:.65}
-
-/* EMPTY */
+.mb.u{background:var(--green);opacity:.65} .mb.d{background:var(--red);opacity:.65}
 .empty{text-align:center;padding:56px 20px;font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:2px;border:1px dashed var(--border)}
 .empty .eb{font-family:'Bebas Neue',sans-serif;font-size:44px;color:var(--dim);display:block;margin-bottom:10px;letter-spacing:3px}
-
-/* LOG */
 .log-toggle{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:8px;padding:10px 0;user-select:none;margin-top:24px}
 .log-toggle:hover{color:var(--ink)}
 .log-box{background:var(--s1);border:1px solid var(--border);max-height:200px;overflow-y:auto;padding:12px;font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);line-height:1.9;display:none}
 .log-box .ok{color:var(--green)} .log-box .er{color:var(--red)} .log-box .wa{color:var(--amber)} .log-box .in{color:var(--cyan)}
-
-/* TOAST */
 .toast{position:fixed;bottom:18px;right:18px;background:var(--green);color:var(--bg);padding:9px 16px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none}
 .toast.show{opacity:1}
-
-@media(max-width:700px){
-  .hero h1{font-size:44px} .hero-bg{display:none}
-  td,th{padding:9px 9px} .td-nm,.td-src{display:none}
-}
+@media(max-width:700px){.hero h1{font-size:44px}.hero-bg{display:none}td,th{padding:9px 9px}.td-nm,.td-src{display:none}}
 </style>
 </head>
 <body>
 <div class="wrap">
 
 <div class="hero">
-  <div class="hero-bg">SCREENER USD</div>
-  <div class="hero-tag">BYMA · USD · SEÑAL REVERSAL · FINES DE SEMANA</div>
-  <h1>CEDEAR SCREENER<br><em>EN DÓLARES</em></h1>
-  <p class="hero-sub">Precios históricos en USD desde Stooq · Análisis técnico independiente del horario de BYMA · Usable fines de semana y feriados.</p>
+  <div class="hero-bg">SCREENER</div>
+  <div class="hero-tag">BYMA · TODOS LOS CEDEARs · USD · STOOQ</div>
+  <h1>CEDEAR SCREENER<br><em>UNIVERSO COMPLETO</em></h1>
+  <p class="hero-sub">Todos los CEDEARs operados en BYMA · Precios USD desde Stooq · Funciona fuera de horario, fines de semana y feriados.</p>
   <div class="chips">
-    <div class="chip c1 on"><div class="cd"></div>MM200: PRECIO ARRIBA</div>
-    <div class="chip c2 on"><div class="cd"></div>RSI: 20–30</div>
-    <div class="chip c3 on"><div class="cd"></div>3 VELAS BAJISTAS</div>
-    <div class="chip c4 on"><div class="cd"></div>ESTOCÁSTICO 15–25 ↑</div>
-    <div class="chip c5 on"><div class="cd"></div>PRECIO EN USD</div>
-  </div>
-</div>
-
-<!-- CCL BAR -->
-<div class="ccl-bar">
-  <span class="ccl-label">CCL del día (AL30/AL30C)</span>
-  <div class="ccl-m">
-    <span class="ml">CCL ARS/$</span>
-    <span class="mv">
-      $<input type="number" class="ccl-input" id="cclInput" value="1486" step="1" min="1">
-    </span>
-  </div>
-  <div class="ccl-m">
-    <span class="ml">Tolerancia desarbitraje</span>
-    <span class="mv sm">±<input type="number" class="ccl-input" id="tolInput" value="3" step="0.5" min="0.5" max="15" style="width:44px">%</span>
-  </div>
-  <div style="font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;margin-left:auto">
-    Precio USD Stooq → × CCL = Precio ARS teórico<br>
-    <span style="color:var(--dim)">Diferencia vs BYMA = desarbitraje</span>
+    <div class="chip c1"><div class="cd"></div>RSI ≤ 30</div>
+    <div class="chip c2"><div class="cd"></div>3 VELAS BAJISTAS CONSECUTIVAS</div>
+    <div class="chip c3"><div class="cd"></div>ESTOCÁSTICO K: 5–25 ↑</div>
+    <div class="chip c4"><div class="cd"></div>USD · MM200 SOLO REFERENCIAL</div>
   </div>
 </div>
 
 <div class="note">
-  ⚡ Fuente USD: <strong>Stooq.com</strong> (histórico EOD gratuito, sin API key) · Formato: AAPL.US, PBR.US, PETR3.SA (Brasil)<br>
-  Funciona fuera de horario BYMA · Los indicadores se calculan sobre la serie en USD del subyacente original.
+  ⚡ Universo: fetch dinámico desde BYMA · Fallback automático: lista hardcodeada ~200 CEDEARs si BYMA no responde<br>
+  Precios USD históricos: Stooq.com (sin API key) · MM200 informativa, no filtra
 </div>
 
-<!-- ACTION BAR -->
 <div class="abar">
   <button class="btn-scan" id="btnScan" onclick="iniciarScan()">▶ INICIAR SCAN</button>
   <button class="btn-g" onclick="exportCSV()">↓ CSV</button>
   <button class="btn-g" onclick="toggleLog()">LOG</button>
-  <div class="scan-info">Universo: <em id="uCount">50</em> CEDEARs · Señales: <em id="fCount">—</em></div>
+  <div class="scan-info">Universo: <em id="uCount">—</em> CEDEARs · Señales: <em id="fCount">—</em></div>
 </div>
 
-<!-- PROGRESS -->
 <div class="prog-wrap" id="progWrap">
   <div class="prog-top"><span id="progLbl">ESCANEANDO…</span><span id="progPct">0%</span></div>
   <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
   <div class="prog-det" id="progDet">Iniciando…</div>
 </div>
 
-<!-- RESULTS -->
 <div class="rh">
   <h2>SEÑALES</h2>
   <span class="rh-ct" id="rhCt" style="display:none"></span>
@@ -219,8 +131,8 @@ td{padding:11px 12px;vertical-align:middle;white-space:nowrap}
   <div id="tableArea">
     <div class="empty">
       <span class="eb">USD</span>
-      El screener descarga histórico en dólares desde Stooq<br>
-      y calcula MM200 · RSI · Velas · Estocástico en USD
+      RSI ≤ 30 · 3 VELAS BAJISTAS · ESTOCÁSTICO 5–25 ↑<br>
+      MM200 solo referencial · Sin restricción de precio
     </div>
   </div>
 </div>
@@ -235,186 +147,341 @@ td{padding:11px 12px;vertical-align:middle;white-space:nowrap}
 
 <script>
 // ══════════════════════════════════════════════
-//  TOP 50 CEDEARs más operados — ticker Stooq
-//  Formato: TICKER.US para NYSE/Nasdaq
-//           TICKER.SA para Bovespa (Brasil)
+//  FALLBACK — lista hardcodeada BYMA 30/9/2025
 // ══════════════════════════════════════════════
-const UNIVERSE = [
-  // TECH US
-  {sym:'AAPL',  stooq:'AAPL.US',  ratio:20,  name:'Apple Inc.'},
-  {sym:'NVDA',  stooq:'NVDA.US',  ratio:10,  name:'Nvidia Corp.'},
-  {sym:'MSFT',  stooq:'MSFT.US',  ratio:30,  name:'Microsoft'},
-  {sym:'AMZN',  stooq:'AMZN.US',  ratio:144, name:'Amazon'},
-  {sym:'GOOGL', stooq:'GOOGL.US', ratio:32,  name:'Alphabet'},
-  {sym:'META',  stooq:'META.US',  ratio:20,  name:'Meta Platforms'},
-  {sym:'TSLA',  stooq:'TSLA.US',  ratio:15,  name:'Tesla'},
-  {sym:'NFLX',  stooq:'NFLX.US',  ratio:90,  name:'Netflix'},
-  {sym:'AMD',   stooq:'AMD.US',   ratio:5,   name:'AMD'},
-  {sym:'INTC',  stooq:'INTC.US',  ratio:5,   name:'Intel'},
-  // FINANCE US
-  {sym:'JPM',   stooq:'JPM.US',   ratio:8,   name:'JPMorgan Chase'},
-  {sym:'BAC',   stooq:'BAC.US',   ratio:3,   name:'Bank of America'},
-  {sym:'GS',    stooq:'GS.US',    ratio:20,  name:'Goldman Sachs'},
-  {sym:'BRK/B', stooq:'BRK-B.US', ratio:10,  name:'Berkshire Hathaway B'},
-  {sym:'V',     stooq:'V.US',     ratio:10,  name:'Visa'},
-  {sym:'MA',    stooq:'MA.US',    ratio:18,  name:'Mastercard'},
-  // ENERGY
-  {sym:'XOM',   stooq:'XOM.US',   ratio:8,   name:'ExxonMobil'},
-  {sym:'CVX',   stooq:'CVX.US',   ratio:8,   name:'Chevron'},
-  {sym:'PBR',   stooq:'PBR.US',   ratio:6,   name:'Petrobras ADR'},
-  // BRASIL
-  {sym:'PETR3', stooq:'PETR3.SA', ratio:2,   name:'Petrobras ON (BRL)'},
-  {sym:'VALE3', stooq:'VALE3.SA', ratio:4,   name:'Vale ON (BRL)'},
-  // CONSUMER
-  {sym:'KO',    stooq:'KO.US',    ratio:6,   name:'Coca-Cola'},
-  {sym:'PEP',   stooq:'PEP.US',   ratio:12,  name:'PepsiCo'},
-  {sym:'MCD',   stooq:'MCD.US',   ratio:25,  name:'McDonald\'s'},
-  {sym:'DIS',   stooq:'DIS.US',   ratio:10,  name:'Disney'},
-  {sym:'NKE',   stooq:'NKE.US',   ratio:5,   name:'Nike'},
-  // LATAM
-  {sym:'MELI',  stooq:'MELI.US',  ratio:120, name:'MercadoLibre'},
-  // ETFs
-  {sym:'SPY',   stooq:'SPY.US',   ratio:25,  name:'SPDR S&P 500'},
-  {sym:'QQQ',   stooq:'QQQ.US',   ratio:20,  name:'Invesco QQQ'},
-  {sym:'GLD',   stooq:'GLD.US',   ratio:10,  name:'SPDR Gold'},
-  // HEALTH
-  {sym:'JNJ',   stooq:'JNJ.US',   ratio:12,  name:'Johnson & Johnson'},
-  {sym:'PFE',   stooq:'PFE.US',   ratio:4,   name:'Pfizer'},
-  {sym:'ABBV',  stooq:'ABBV.US',  ratio:12,  name:'AbbVie'},
-  {sym:'LLY',   stooq:'LLY.US',   ratio:100, name:'Eli Lilly'},
-  {sym:'MRK',   stooq:'MRK.US',   ratio:10,  name:'Merck'},
-  // INDUSTRIAL
-  {sym:'BA',    stooq:'BA.US',    ratio:40,  name:'Boeing'},
-  {sym:'CAT',   stooq:'CAT.US',   ratio:25,  name:'Caterpillar'},
-  {sym:'GE',    stooq:'GE.US',    ratio:10,  name:'GE Aerospace'},
-  {sym:'HON',   stooq:'HON.US',   ratio:20,  name:'Honeywell'},
-  // MATERIALS
-  {sym:'VALE',  stooq:'VALE.US',  ratio:4,   name:'Vale ADR (USD)'},
-  {sym:'FCX',   stooq:'FCX.US',   ratio:5,   name:'Freeport-McMoRan'},
-  // SEMI
-  {sym:'AVGO',  stooq:'AVGO.US',  ratio:30,  name:'Broadcom'},
-  {sym:'QCOM',  stooq:'QCOM.US',  ratio:10,  name:'Qualcomm'},
-  {sym:'MU',    stooq:'MU.US',    ratio:6,   name:'Micron'},
-  {sym:'ASML',  stooq:'ASML.US',  ratio:50,  name:'ASML Holding'},
-  // CLOUD / SOFTWARE
-  {sym:'CRM',   stooq:'CRM.US',   ratio:20,  name:'Salesforce'},
-  {sym:'ADBE',  stooq:'ADBE.US',  ratio:45,  name:'Adobe'},
-  {sym:'NOW',   stooq:'NOW.US',   ratio:50,  name:'ServiceNow'},
-  {sym:'ORCL',  stooq:'ORCL.US',  ratio:10,  name:'Oracle'},
-  {sym:'PYPL',  stooq:'PYPL.US',  ratio:6,   name:'PayPal'},
+const FALLBACK = [
+  {sym:'MMM',   name:'3M Company',                stooq:'MMM.US',   ratio:10},
+  {sym:'ABT',   name:'Abbott Labs',               stooq:'ABT.US',   ratio:4},
+  {sym:'ABBV',  name:'AbbVie Inc.',               stooq:'ABBV.US',  ratio:10},
+  {sym:'ANF',   name:'Abercrombie & Fitch',       stooq:'ANF.US',   ratio:1},
+  {sym:'ACN',   name:'Accenture',                 stooq:'ACN.US',   ratio:75},
+  {sym:'ADBE',  name:'Adobe Systems',             stooq:'ADBE.US',  ratio:44},
+  {sym:'AMD',   name:'Advanced Micro Devices',    stooq:'AMD.US',   ratio:10},
+  {sym:'ABNB',  name:'Airbnb Inc',                stooq:'ABNB.US',  ratio:15},
+  {sym:'BABA',  name:'Alibaba Group',             stooq:'BABA.US',  ratio:9},
+  {sym:'GOOGL', name:'Alphabet Inc.',             stooq:'GOOGL.US', ratio:58},
+  {sym:'MO',    name:'Altria Group',              stooq:'MO.US',    ratio:4},
+  {sym:'AMZN',  name:'Amazon.com',                stooq:'AMZN.US',  ratio:144},
+  {sym:'ABEV',  name:'Ambev ADR',                 stooq:'ABEV.US',  ratio:1},
+  {sym:'ABEV3', name:'Ambev B3',                  stooq:'ABEV3.SA', ratio:1},
+  {sym:'AAL',   name:'American Airlines',         stooq:'AAL.US',   ratio:2},
+  {sym:'AXP',   name:'American Express',          stooq:'AXP.US',   ratio:15},
+  {sym:'AIG',   name:'American Intl Group',       stooq:'AIG.US',   ratio:5},
+  {sym:'AMGN',  name:'Amgen Inc.',                stooq:'AMGN.US',  ratio:30},
+  {sym:'ADI',   name:'Analog Devices',            stooq:'ADI.US',   ratio:15},
+  {sym:'AAPL',  name:'Apple Inc.',                stooq:'AAPL.US',  ratio:20},
+  {sym:'AMAT',  name:'Applied Materials',         stooq:'AMAT.US',  ratio:5},
+  {sym:'ARKK',  name:'ARK Innovation ETF',        stooq:'ARKK.US',  ratio:10},
+  {sym:'ARM',   name:'ARM Holdings',              stooq:'ARM.US',   ratio:27},
+  {sym:'ASML',  name:'ASML Holding',              stooq:'ASML.US',  ratio:146},
+  {sym:'AZN',   name:'AstraZeneca',               stooq:'AZN.US',   ratio:2},
+  {sym:'T',     name:'AT&T Inc.',                 stooq:'T.US',     ratio:3},
+  {sym:'ADP',   name:'Automatic Data Processing', stooq:'ADP.US',   ratio:6},
+  {sym:'BIDU',  name:'Baidu Inc.',                stooq:'BIDU.US',  ratio:11},
+  {sym:'BKR',   name:'Baker Hughes',              stooq:'BKR.US',   ratio:7},
+  {sym:'BBD',   name:'Banco Bradesco ADR',        stooq:'BBD.US',   ratio:1},
+  {sym:'BBAS3', name:'Banco do Brasil B3',        stooq:'BBAS3.SA', ratio:2},
+  {sym:'BSBR',  name:'Banco Santander Brasil',    stooq:'BSBR.US',  ratio:1},
+  {sym:'SAN',   name:'Banco Santander S.A.',      stooq:'SAN.US',   ratio:4},
+  {sym:'BAC',   name:'Bank of America',           stooq:'BAC.US',   ratio:4},
+  {sym:'BCS',   name:'Barclays Bank',             stooq:'BCS.US',   ratio:1},
+  {sym:'B',     name:'Barrick Gold',              stooq:'B.US',     ratio:2},
+  {sym:'BAYN',  name:'Bayer AG',                  stooq:'BAYN.DE',  ratio:3},
+  {sym:'BRKB',  name:'Berkshire Hathaway B',      stooq:'BRK-B.US', ratio:22},
+  {sym:'BHP',   name:'BHP Group',                 stooq:'BHP.US',   ratio:2},
+  {sym:'BIIB',  name:'Biogen Inc.',               stooq:'BIIB.US',  ratio:13},
+  {sym:'BKNG',  name:'Booking Holdings',          stooq:'BKNG.US',  ratio:700},
+  {sym:'BP',    name:'BP PCL',                    stooq:'BP.US',    ratio:5},
+  {sym:'BMY',   name:'Bristol-Myers Squibb',      stooq:'BMY.US',   ratio:3},
+  {sym:'AVGO',  name:'Broadcom Inc.',             stooq:'AVGO.US',  ratio:39},
+  {sym:'BG',    name:'Bunge Limited',             stooq:'BG.US',    ratio:5},
+  {sym:'AI',    name:'C3.AI Inc.',                stooq:'AI.US',    ratio:5},
+  {sym:'CAH',   name:'Cardinal Health',           stooq:'CAH.US',   ratio:3},
+  {sym:'CCL',   name:'Carnival Corp',             stooq:'CCL.US',   ratio:3},
+  {sym:'CAT',   name:'Caterpillar',               stooq:'CAT.US',   ratio:20},
+  {sym:'CLS',   name:'Celestica Inc.',            stooq:'CLS.US',   ratio:20},
+  {sym:'SCHW',  name:'Charles Schwab',            stooq:'SCHW.US',  ratio:13},
+  {sym:'CVX',   name:'Chevron Corp.',             stooq:'CVX.US',   ratio:16},
+  {sym:'CSCO',  name:'Cisco Systems',             stooq:'CSCO.US',  ratio:5},
+  {sym:'C',     name:'Citigroup Inc.',            stooq:'C.US',     ratio:3},
+  {sym:'CL',    name:'Colgate Palmolive',         stooq:'CL.US',    ratio:3},
+  {sym:'COIN',  name:'Coinbase Global',           stooq:'COIN.US',  ratio:27},
+  {sym:'CEG',   name:'Constellation Energy',      stooq:'CEG.US',   ratio:45},
+  {sym:'COST',  name:'Costco Wholesale',          stooq:'COST.US',  ratio:48},
+  {sym:'CVS',   name:'CVS Health',                stooq:'CVS.US',   ratio:15},
+  {sym:'DHR',   name:'Danaher Corp',              stooq:'DHR.US',   ratio:54},
+  {sym:'DE',    name:'Deere & Co.',               stooq:'DE.US',    ratio:40},
+  {sym:'DAL',   name:'Delta Air Lines',           stooq:'DAL.US',   ratio:8},
+  {sym:'DEO',   name:'Diageo PLC',                stooq:'DEO.US',   ratio:6},
+  {sym:'SPXL',  name:'Direxion S&P500 Bull 3X',   stooq:'SPXL.US',  ratio:25},
+  {sym:'DOCU',  name:'DocuSign Inc.',             stooq:'DOCU.US',  ratio:22},
+  {sym:'DOW',   name:'DOW Inc',                   stooq:'DOW.US',   ratio:6},
+  {sym:'EBAY',  name:'eBay Inc.',                 stooq:'EBAY.US',  ratio:2},
+  {sym:'EA',    name:'Electronic Arts',           stooq:'EA.US',    ratio:14},
+  {sym:'LLY',   name:'Eli Lilly',                 stooq:'LLY.US',   ratio:56},
+  {sym:'ERJ',   name:'Embraer',                   stooq:'ERJ.US',   ratio:1},
+  {sym:'XLE',   name:'Energy Select SPDR',        stooq:'XLE.US',   ratio:2},
+  {sym:'ETSY',  name:'Etsy Inc.',                 stooq:'ETSY.US',  ratio:16},
+  {sym:'XOM',   name:'ExxonMobil',                stooq:'XOM.US',   ratio:10},
+  {sym:'FDX',   name:'FedEx Corp',                stooq:'FDX.US',   ratio:10},
+  {sym:'RACE',  name:'Ferrari',                   stooq:'RACE.US',  ratio:83},
+  {sym:'XLF',   name:'Financial Select SPDR',     stooq:'XLF.US',   ratio:2},
+  {sym:'FSLR',  name:'First Solar',               stooq:'FSLR.US',  ratio:18},
+  {sym:'FCX',   name:'Freeport McMoRan',          stooq:'FCX.US',   ratio:3},
+  {sym:'GRMN',  name:'Garmin Ltd.',               stooq:'GRMN.US',  ratio:3},
+  {sym:'GE',    name:'General Electric',          stooq:'GE.US',    ratio:8},
+  {sym:'GM',    name:'General Motors',            stooq:'GM.US',    ratio:6},
+  {sym:'GGB',   name:'Gerdau S.A.',               stooq:'GGB.US',   ratio:4},
+  {sym:'GILD',  name:'Gilead Sciences',           stooq:'GILD.US',  ratio:4},
+  {sym:'URA',   name:'Global X Uranium ETF',      stooq:'URA.US',   ratio:5},
+  {sym:'GLOB',  name:'Globant S.A.',              stooq:'GLOB.US',  ratio:18},
+  {sym:'GFI',   name:'Gold Fields',               stooq:'GFI.US',   ratio:1},
+  {sym:'HAL',   name:'Halliburton',               stooq:'HAL.US',   ratio:2},
+  {sym:'HAPV3', name:'Hapvida B3',                stooq:'HAPV3.SA', ratio:1},
+  {sym:'HOG',   name:'Harley-Davidson',           stooq:'HOG.US',   ratio:3},
+  {sym:'HDB',   name:'HDFC Bank',                 stooq:'HDB.US',   ratio:2},
+  {sym:'HL',    name:'Hecla Mining',              stooq:'HL.US',    ratio:1},
+  {sym:'HMC',   name:'Honda Motor',               stooq:'HMC.US',   ratio:1},
+  {sym:'HON',   name:'Honeywell Intl',            stooq:'HON.US',   ratio:8},
+  {sym:'HWM',   name:'Howmet Aerospace',          stooq:'HWM.US',   ratio:1},
+  {sym:'HPQ',   name:'HP Inc',                    stooq:'HPQ.US',   ratio:1},
+  {sym:'HSBC',  name:'HSBC Holdings',             stooq:'HSBC.US',  ratio:2},
+  {sym:'HUT',   name:'Hut 8 Mining',              stooq:'HUT.US',   ratio:5},
+  {sym:'IBN',   name:'ICICI Bank',                stooq:'IBN.US',   ratio:1},
+  {sym:'INFY',  name:'Infosys',                   stooq:'INFY.US',  ratio:1},
+  {sym:'ING',   name:'ING Groep',                 stooq:'ING.US',   ratio:3},
+  {sym:'INTC',  name:'Intel Corp.',               stooq:'INTC.US',  ratio:5},
+  {sym:'IBM',   name:'IBM',                       stooq:'IBM.US',   ratio:15},
+  {sym:'IFF',   name:'Intl Flavors',              stooq:'IFF.US',   ratio:12},
+  {sym:'IP',    name:'International Paper',       stooq:'IP.US',    ratio:4},
+  {sym:'ISRG',  name:'Intuitive Surgical',        stooq:'ISRG.US',  ratio:90},
+  {sym:'QQQ',   name:'Invesco QQQ Trust',         stooq:'QQQ.US',   ratio:20},
+  {sym:'IBIT',  name:'iShares Bitcoin Trust',     stooq:'IBIT.US',  ratio:10},
+  {sym:'FXI',   name:'iShares China Large-Cap',   stooq:'FXI.US',   ratio:5},
+  {sym:'IEMG',  name:'iShares Core MSCI EM',      stooq:'IEMG.US',  ratio:12},
+  {sym:'IJH',   name:'iShares Core S&P Mid-Cap',  stooq:'IJH.US',   ratio:12},
+  {sym:'ACWI',  name:'iShares MSCI ACWI',         stooq:'ACWI.US',  ratio:26},
+  {sym:'EWZ',   name:'iShares MSCI Brazil',       stooq:'EWZ.US',   ratio:2},
+  {sym:'EFA',   name:'iShares MSCI EAFE',         stooq:'EFA.US',   ratio:18},
+  {sym:'EEM',   name:'iShares MSCI EM',           stooq:'EEM.US',   ratio:5},
+  {sym:'EWJ',   name:'iShares MSCI Japan',        stooq:'EWJ.US',   ratio:14},
+  {sym:'IBB',   name:'iShares Nasdaq Biotech',    stooq:'IBB.US',   ratio:27},
+  {sym:'IVW',   name:'iShares S&P 500 Growth',    stooq:'IVW.US',   ratio:20},
+  {sym:'IVE',   name:'iShares S&P 500 Value',     stooq:'IVE.US',   ratio:40},
+  {sym:'SLV',   name:'iShares Silver Trust',      stooq:'SLV.US',   ratio:6},
+  {sym:'IWM',   name:'iShares Russell 2000',      stooq:'IWM.US',   ratio:10},
+  {sym:'ITUB',  name:'Itaú Unibanco ADR',         stooq:'ITUB.US',  ratio:1},
+  {sym:'JPM',   name:'JPMorgan Chase',            stooq:'JPM.US',   ratio:15},
+  {sym:'JD',    name:'JD.com Inc.',               stooq:'JD.US',    ratio:4},
+  {sym:'JNJ',   name:'Johnson & Johnson',         stooq:'JNJ.US',   ratio:15},
+  {sym:'JCI',   name:'Johnson Controls',          stooq:'JCI.US',   ratio:2},
+  {sym:'KMB',   name:'Kimberly-Clark',            stooq:'KMB.US',   ratio:6},
+  {sym:'KGC',   name:'Kinross Gold',              stooq:'KGC.US',   ratio:1},
+  {sym:'LRCX',  name:'Lam Research',              stooq:'LRCX.US',  ratio:56},
+  {sym:'LVS',   name:'Las Vegas Sands',           stooq:'LVS.US',   ratio:2},
+  {sym:'RENT3', name:'Localiza B3',               stooq:'RENT3.SA', ratio:2},
+  {sym:'LMT',   name:'Lockheed Martin',           stooq:'LMT.US',   ratio:20},
+  {sym:'LREN3', name:'Lojas Renner B3',           stooq:'LREN3.SA', ratio:1},
+  {sym:'MGLU3', name:'Magazine Luiza B3',         stooq:'MGLU3.SA', ratio:1},
+  {sym:'MRVL',  name:'Marvell Technology',        stooq:'MRVL.US',  ratio:14},
+  {sym:'MA',    name:'Mastercard',                stooq:'MA.US',    ratio:33},
+  {sym:'MCD',   name:"McDonald's",               stooq:'MCD.US',   ratio:24},
+  {sym:'MDT',   name:'Medtronic',                 stooq:'MDT.US',   ratio:4},
+  {sym:'MELI',  name:'MercadoLibre',              stooq:'MELI.US',  ratio:120},
+  {sym:'MRK',   name:'Merck & Co.',               stooq:'MRK.US',   ratio:5},
+  {sym:'META',  name:'Meta Platforms',            stooq:'META.US',  ratio:24},
+  {sym:'MU',    name:'Micron Technology',         stooq:'MU.US',    ratio:5},
+  {sym:'MSFT',  name:'Microsoft',                 stooq:'MSFT.US',  ratio:30},
+  {sym:'MSTR',  name:'MicroStrategy',             stooq:'MSTR.US',  ratio:20},
+  {sym:'MRNA',  name:'Moderna Inc',               stooq:'MRNA.US',  ratio:19},
+  {sym:'MDLZ',  name:'Mondelez',                  stooq:'MDLZ.US',  ratio:15},
+  {sym:'MSI',   name:'Motorola Solutions',        stooq:'MSI.US',   ratio:20},
+  {sym:'NTES',  name:'NetEase Inc',               stooq:'NTES.US',  ratio:14},
+  {sym:'NFLX',  name:'Netflix',                   stooq:'NFLX.US',  ratio:48},
+  {sym:'NEM',   name:'Newmont Corp',              stooq:'NEM.US',   ratio:3},
+  {sym:'NKE',   name:'Nike Inc.',                 stooq:'NKE.US',   ratio:12},
+  {sym:'NIO',   name:'NIO Inc.',                  stooq:'NIO.US',   ratio:4},
+  {sym:'NVS',   name:'Novartis AG',               stooq:'NVS.US',   ratio:4},
+  {sym:'NUE',   name:'Nucor Corp',                stooq:'NUE.US',   ratio:16},
+  {sym:'NVDA',  name:'Nvidia',                    stooq:'NVDA.US',  ratio:24},
+  {sym:'OXY',   name:'Occidental Petroleum',      stooq:'OXY.US',   ratio:5},
+  {sym:'ORCL',  name:'Oracle Corp',               stooq:'ORCL.US',  ratio:3},
+  {sym:'PCAR',  name:'PACCAR Inc.',               stooq:'PCAR.US',  ratio:3},
+  {sym:'PAGS',  name:'PagSeguro Digital',         stooq:'PAGS.US',  ratio:3},
+  {sym:'PLTR',  name:'Palantir Technologies',     stooq:'PLTR.US',  ratio:3},
+  {sym:'PANW',  name:'Palo Alto Networks',        stooq:'PANW.US',  ratio:50},
+  {sym:'PAAS',  name:'Pan American Silver',       stooq:'PAAS.US',  ratio:3},
+  {sym:'PYPL',  name:'PayPal Holdings',           stooq:'PYPL.US',  ratio:8},
+  {sym:'PDD',   name:'PDD Holdings',              stooq:'PDD.US',   ratio:25},
+  {sym:'PEP',   name:'PepsiCo',                   stooq:'PEP.US',   ratio:18},
+  {sym:'PETR3', name:'Petrobras B3',              stooq:'PETR3.SA', ratio:1},
+  {sym:'PBR',   name:'Petrobras ADR',             stooq:'PBR.US',   ratio:1},
+  {sym:'PFE',   name:'Pfizer Inc.',               stooq:'PFE.US',   ratio:4},
+  {sym:'PM',    name:'Philip Morris',             stooq:'PM.US',    ratio:18},
+  {sym:'PSX',   name:'Phillips 66',               stooq:'PSX.US',   ratio:6},
+  {sym:'PINS',  name:'Pinterest',                 stooq:'PINS.US',  ratio:7},
+  {sym:'PG',    name:'Procter & Gamble',          stooq:'PG.US',    ratio:15},
+  {sym:'PSQ',   name:'ProShares Short QQQ',       stooq:'PSQ.US',   ratio:8},
+  {sym:'SH',    name:'ProShares Short S&P500',    stooq:'SH.US',    ratio:8},
+  {sym:'TQQQ',  name:'ProShares UltraPro QQQ',    stooq:'TQQQ.US',  ratio:25},
+  {sym:'QCOM',  name:'Qualcomm',                  stooq:'QCOM.US',  ratio:11},
+  {sym:'RTX',   name:'Raytheon Technologies',     stooq:'RTX.US',   ratio:5},
+  {sym:'RGTI',  name:'Rigetti Computing',         stooq:'RGTI.US',  ratio:2},
+  {sym:'RIO',   name:'Rio Tinto',                 stooq:'RIO.US',   ratio:8},
+  {sym:'RIOT',  name:'Riot Platforms',            stooq:'RIOT.US',  ratio:3},
+  {sym:'ROKU',  name:'Roku',                      stooq:'ROKU.US',  ratio:13},
+  {sym:'ROST',  name:'Ross Stores',               stooq:'ROST.US',  ratio:4},
+  {sym:'SHEL',  name:'Shell Plc',                 stooq:'SHEL.US',  ratio:2},
+  {sym:'SPGI',  name:'S&P Global',                stooq:'SPGI.US',  ratio:45},
+  {sym:'CRM',   name:'Salesforce',                stooq:'CRM.US',   ratio:18},
+  {sym:'SAP',   name:'SAP SE',                    stooq:'SAP.US',   ratio:6},
+  {sym:'SLB',   name:'Schlumberger',              stooq:'SLB.US',   ratio:3},
+  {sym:'SE',    name:'Sea Ltd.',                  stooq:'SE.US',    ratio:32},
+  {sym:'NOW',   name:'ServiceNow',                stooq:'NOW.US',   ratio:172},
+  {sym:'SHOP',  name:'Shopify Inc.',              stooq:'SHOP.US',  ratio:107},
+  {sym:'SNAP',  name:'Snap Inc.',                 stooq:'SNAP.US',  ratio:1},
+  {sym:'SNOW',  name:'Snowflake',                 stooq:'SNOW.US',  ratio:30},
+  {sym:'SONY',  name:'Sony Group',                stooq:'SONY.US',  ratio:8},
+  {sym:'SCCO',  name:'Southern Copper',           stooq:'SCCO.US',  ratio:2},
+  {sym:'DIA',   name:'SPDR Dow Jones ETF',        stooq:'DIA.US',   ratio:20},
+  {sym:'SPY',   name:'SPDR S&P 500 ETF',         stooq:'SPY.US',   ratio:20},
+  {sym:'GLD',   name:'SPDR Gold Trust',           stooq:'GLD.US',   ratio:50},
+  {sym:'SPOT',  name:'Spotify Technology',        stooq:'SPOT.US',  ratio:28},
+  {sym:'SBUX',  name:'Starbucks',                 stooq:'SBUX.US',  ratio:12},
+  {sym:'STLA',  name:'Stellantis',                stooq:'STLA.US',  ratio:5},
+  {sym:'SUZB3', name:'Suzano B3',                 stooq:'SUZB3.SA', ratio:1},
+  {sym:'SUZ',   name:'Suzano ADR',                stooq:'SUZ.US',   ratio:1},
+  {sym:'SYY',   name:'Sysco Corp.',               stooq:'SYY.US',   ratio:8},
+  {sym:'TSM',   name:'Taiwan Semiconductor',      stooq:'TSM.US',   ratio:9},
+  {sym:'TGT',   name:'Target Corp',               stooq:'TGT.US',   ratio:24},
+  {sym:'TTM',   name:'Tata Motors',               stooq:'TTM.US',   ratio:1},
+  {sym:'TEM',   name:'Tempus AI',                 stooq:'TEM.US',   ratio:12},
+  {sym:'TS',    name:'Tenaris',                   stooq:'TS.US',    ratio:1},
+  {sym:'TSLA',  name:'Tesla Inc.',                stooq:'TSLA.US',  ratio:15},
+  {sym:'TXN',   name:'Texas Instruments',         stooq:'TXN.US',   ratio:10},
+  {sym:'TEAM',  name:'Atlassian Corp',            stooq:'TEAM.US',  ratio:47},
+  {sym:'TX',    name:'Ternium S.A.',              stooq:'TX.US',    ratio:4},
+  {sym:'NU',    name:'Nu Holdings',               stooq:'NU.US',    ratio:2},
+  {sym:'UPS',   name:'United Parcel Service',     stooq:'UPS.US',   ratio:10},
+  {sym:'VALE',  name:'Vale ADR',                  stooq:'VALE.US',  ratio:4},
+  {sym:'VIV',   name:'Telefônica Brasil ADR',     stooq:'VIV.US',   ratio:1},
+  {sym:'VIVT3', name:'Telefônica Brasil B3',      stooq:'VIVT3.SA', ratio:1},
+  {sym:'VZ',    name:'Verizon',                   stooq:'VZ.US',    ratio:5},
+  {sym:'VIG',   name:'Vanguard Dividend ETF',     stooq:'VIG.US',   ratio:39},
+  {sym:'VRTX',  name:'Vertex Pharmaceuticals',    stooq:'VRTX.US',  ratio:101},
+  {sym:'VST',   name:'Vistra Corp',               stooq:'VST.US',   ratio:26},
+  {sym:'V',     name:'Visa Inc.',                 stooq:'V.US',     ratio:10},
+  {sym:'WMT',   name:'Walmart Inc.',              stooq:'WMT.US',   ratio:10},
+  {sym:'DIS',   name:'Walt Disney',               stooq:'DIS.US',   ratio:10},
+  {sym:'WFC',   name:'Wells Fargo',               stooq:'WFC.US',   ratio:6},
+  {sym:'XPEV',  name:'XPeng Inc.',                stooq:'XPEV.US',  ratio:4},
+  {sym:'ETHA',  name:'iShares Ethereum Trust',    stooq:'ETHA.US',  ratio:5},
+  {sym:'ITA',   name:'iShares Aerospace',         stooq:'ITA.US',   ratio:10},
+  {sym:'DECK',  name:'Deckers Outdoor',           stooq:'DECK.US',  ratio:25},
+  {sym:'PATH',  name:'UiPath Inc.',               stooq:'PATH.US',  ratio:2},
+  {sym:'RBLX',  name:'Roblox Corp.',              stooq:'RBLX.US',  ratio:2},
 ];
 
-// ── ESTADO ───────────────────────────────────
-let resultados = [];
-let parciales  = [];
-let sortCol = 'rsi', sortDir = 'asc';
-let logLines = [];
+// ── SUFIJOS STOOQ por mercado ──
+const SUFFIX_MAP = {
+  'PETR3':'PETR3.SA','ABEV3':'ABEV3.SA','BBAS3':'BBAS3.SA',
+  'BBDC3':'BBDC3.SA','HAPV3':'HAPV3.SA','ITUB3':'ITUB3.SA',
+  'LREN3':'LREN3.SA','MGLU3':'MGLU3.SA','NTCO3':'NTCO3.SA',
+  'PRIO3':'PRIO3.SA','RENT3':'RENT3.SA','SBSP3':'SBSP3.SA',
+  'SUZB3':'SUZB3.SA','VIVT3':'VIVT3.SA','BRKB':'BRK-B.US','BAYN':'BAYN.DE',
+};
+function toStooq(sym) {
+  const u = sym.toUpperCase().trim();
+  if (SUFFIX_MAP[u]) return SUFFIX_MAP[u];
+  return u.replace(/[^A-Z0-9\-]/g,'') + '.US';
+}
 
-// ── PROXY CORS ────────────────────────────────
-// allorigins.win como proxy para Stooq (CORS bloqueado en browser directo)
+// ── ESTADO ──
+let resultados=[], parciales=[], logLines=[];
+let sortCol='rsi', sortDir='asc';
+let UNIVERSE=[];
+
 const PROXY = 'https://api.allorigins.win/raw?url=';
-const STOOQ = 'https://stooq.com/q/d/l/?s=';
+const STOOQ  = 'https://stooq.com/q/d/l/?s=';
+const BYMA_URL = 'https://open.bymadata.com.ar/vanoms-be-core/rest/api/bymadata/free/bnown-cedears';
 
-// ── HELPERS ───────────────────────────────────
-function log(msg, type='in') {
+// ── UI HELPERS ──
+function addLog(msg, type='in') {
   logLines.push({msg,type});
-  const box = document.getElementById('logBox');
-  const d = document.createElement('div');
-  d.className = type;
-  const ts = new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  d.textContent = `[${ts}] ${msg}`;
+  const box=document.getElementById('logBox');
+  const d=document.createElement('div');
+  d.className=type;
+  const ts=new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  d.textContent=`[${ts}] ${msg}`;
   box.appendChild(d);
-  box.scrollTop = box.scrollHeight;
-  document.getElementById('logCt').textContent = `(${logLines.length})`;
+  box.scrollTop=box.scrollHeight;
+  document.getElementById('logCt').textContent=`(${logLines.length})`;
 }
-
 function toggleLog() {
-  const b = document.getElementById('logBox');
-  const a = document.getElementById('logArr');
-  const show = b.style.display !== 'block';
-  b.style.display = show ? 'block' : 'none';
-  a.textContent = show ? '▼' : '▶';
+  const b=document.getElementById('logBox'), a=document.getElementById('logArr');
+  const show=b.style.display!=='block';
+  b.style.display=show?'block':'none';
+  a.textContent=show?'▼':'▶';
+}
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+function setProgress(pct,lbl,det) {
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progPct').textContent=Math.round(pct)+'%';
+  if(lbl) document.getElementById('progLbl').textContent=lbl;
+  if(det) document.getElementById('progDet').textContent=det;
 }
 
-function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 2600);
-}
-
-function setProgress(pct, lbl, det) {
-  document.getElementById('progFill').style.width = pct+'%';
-  document.getElementById('progPct').textContent = Math.round(pct)+'%';
-  if(lbl) document.getElementById('progLbl').textContent = lbl;
-  if(det) document.getElementById('progDet').textContent = det;
-}
-
-// ── FETCH STOOQ CSV ───────────────────────────
-async function fetchStooqCSV(stooqSym) {
-  // Fecha: últimos 400 días
-  const now = new Date();
-  const d2 = now.toISOString().split('T')[0].replace(/-/g,'');
-  const past = new Date(now - 400*86400000);
-  const d1 = past.toISOString().split('T')[0].replace(/-/g,'');
-
-  const url = `${STOOQ}${encodeURIComponent(stooqSym)}&d1=${d1}&d2=${d2}&i=d`;
-  const proxied = PROXY + encodeURIComponent(url);
-
-  const r = await fetch(proxied, { signal: AbortSignal.timeout(12000) });
-  if (!r.ok) throw new Error(`HTTP ${r.status}`);
-  const text = await r.text();
-
-  // Parsear CSV: Date,Open,High,Low,Close,Volume
-  const lines = text.trim().split('\n');
-  if (lines.length < 3) throw new Error('Sin datos suficientes');
-
-  const candles = [];
-  for (let i = 1; i < lines.length; i++) {
-    const cols = lines[i].split(',');
-    if (cols.length < 5) continue;
-    const close = parseFloat(cols[4]);
-    const open  = parseFloat(cols[1]);
-    const high  = parseFloat(cols[2]);
-    const low   = parseFloat(cols[3]);
-    if (!close || isNaN(close)) continue;
-    candles.push({ date:cols[0], open, high, low, close });
+// ── FETCH STOOQ ──
+async function fetchStooq(stooqSym) {
+  const now=new Date();
+  const d2=now.toISOString().split('T')[0].replace(/-/g,'');
+  const past=new Date(now-400*86400000);
+  const d1=past.toISOString().split('T')[0].replace(/-/g,'');
+  const url=`${STOOQ}${encodeURIComponent(stooqSym)}&d1=${d1}&d2=${d2}&i=d`;
+  const r=await fetch(PROXY+encodeURIComponent(url),{signal:AbortSignal.timeout(12000)});
+  if(!r.ok) throw new Error(`HTTP ${r.status}`);
+  const txt=await r.text();
+  const lines=txt.trim().split('\n');
+  if(lines.length<3) throw new Error('Sin datos');
+  const candles=[];
+  for(let i=1;i<lines.length;i++) {
+    const c=lines[i].split(',');
+    if(c.length<5) continue;
+    const close=parseFloat(c[4]);
+    if(!close||isNaN(close)) continue;
+    candles.push({date:c[0],open:parseFloat(c[1]),high:parseFloat(c[2]),low:parseFloat(c[3]),close});
   }
-
-  // Stooq devuelve orden descendente — invertir
   candles.reverse();
   return candles;
 }
 
-// ── INDICADORES ───────────────────────────────
-function calcMM(closes, n) {
-  if (closes.length < n) return null;
-  const sl = closes.slice(-n);
-  return sl.reduce((a,b)=>a+b,0)/n;
+// ── INDICADORES ──
+function calcMM200(closes) {
+  if(closes.length<200) return null;
+  return closes.slice(-200).reduce((a,b)=>a+b,0)/200;
 }
-
-function calcRSI(closes, n=14) {
-  if (closes.length < n+1) return null;
-  const sl = closes.slice(-(n+1));
-  let g=0, l=0;
-  for (let i=1;i<sl.length;i++) {
-    const d = sl[i]-sl[i-1];
-    if(d>0) g+=d; else l-=d;
-  }
-  const ag=g/n, al=l/n;
+function calcRSI(closes,n=14) {
+  if(closes.length<n+1) return null;
+  const sl=closes.slice(-(n+1));
+  let g=0,l=0;
+  for(let i=1;i<sl.length;i++){const d=sl[i]-sl[i-1];if(d>0)g+=d;else l-=d;}
+  const ag=g/n,al=l/n;
   if(al===0) return 100;
   return 100-100/(1+ag/al);
 }
-
-function calcEsto(candles, kP=14, dP=3) {
-  if (candles.length < kP+dP) return {k:null,d:null,trend:null};
+function calcEsto(candles,kP=14,dP=3) {
+  if(candles.length<kP+dP) return {k:null,d:null,trend:null};
   const kVals=[];
-  for(let i=candles.length-dP;i<candles.length;i++) {
+  for(let i=candles.length-dP;i<candles.length;i++){
     const win=candles.slice(i-kP+1,i+1);
     const hi=Math.max(...win.map(c=>c.high));
     const lo=Math.min(...win.map(c=>c.low));
     const cl=candles[i].close;
-    kVals.push(hi===lo ? 50 : ((cl-lo)/(hi-lo))*100);
+    kVals.push(hi===lo?50:((cl-lo)/(hi-lo))*100);
   }
   const k=kVals[kVals.length-1];
   const d=kVals.reduce((a,b)=>a+b,0)/kVals.length;
@@ -422,168 +489,190 @@ function calcEsto(candles, kP=14, dP=3) {
   return {k,d,trend};
 }
 
+// FILTRO 2: últimas 3 velas BAJISTAS CONSECUTIVAS (close < open en las 3)
 function check3Bears(candles) {
   if(candles.length<3) return false;
   return candles.slice(-3).every(c=>c.close<c.open);
 }
 
-// ── ANALIZAR ──────────────────────────────────
+// ── ANALIZAR ──
 async function analizar(item) {
   let candles;
-  try {
-    candles = await fetchStooqCSV(item.stooq);
-  } catch(e) {
-    log(`✗ ${item.sym} (${item.stooq}): ${e.message}`, 'er');
-    return null;
-  }
+  try { candles=await fetchStooq(item.stooq); }
+  catch(e) { addLog(`✗ ${item.sym}: ${e.message}`,'er'); return null; }
+  if(candles.length<20) { addLog(`✗ ${item.sym}: solo ${candles.length} velas`,'wa'); return null; }
 
-  if (candles.length < 50) {
-    log(`✗ ${item.sym}: solo ${candles.length} velas — insuficiente`, 'wa');
-    return null;
-  }
+  const closes=candles.map(c=>c.close);
+  const last=closes[closes.length-1];
 
-  const closes = candles.map(c=>c.close);
-  const last   = closes[closes.length-1];
+  // MM200 — solo referencial
+  const mm200=calcMM200(closes);
+  const pctMM=mm200?(((last-mm200)/mm200)*100).toFixed(2):null;
 
-  const mm200    = calcMM(closes, 200);
-  if (!mm200) { log(`✗ ${item.sym}: sin MM200 (${candles.length} velas)`, 'wa'); return null; }
+  // FILTRO 1: RSI ≤ 30 (sin límite inferior)
+  const rsi=calcRSI(closes,14);
+  const rsiOk=rsi!==null && rsi<=30;
 
-  const sobreMM  = last > mm200;
-  const rsi      = calcRSI(closes, 14);
-  const rsiOk    = rsi!==null && rsi>=20 && rsi<=30;
-  const bears    = check3Bears(candles);
-  const esto     = calcEsto(candles, 14, 3);
-  const estoOk   = esto.k!==null && esto.k>=15 && esto.k<=25 && esto.trend==='up';
+  // FILTRO 2: últimas 3 velas bajistas consecutivas
+  const bears=check3Bears(candles);
 
-  const filtros  = [sobreMM, rsiOk, bears, estoOk];
-  const cumple   = filtros.filter(Boolean).length;
-  const pctMM    = mm200 ? (((last-mm200)/mm200)*100).toFixed(2) : null;
+  // FILTRO 3: Estocástico K entre 5 y 25, apuntando arriba
+  const esto=calcEsto(candles,14,3);
+  const estoOk=esto.k!==null && esto.k>=5 && esto.k<=25 && esto.trend==='up';
+
+  const filtros=[rsiOk,bears,estoOk];
+  const cumple=filtros.filter(Boolean).length;
 
   return {
-    ...item, last, mm200: mm200?.toFixed(3), sobreMM, rsi: rsi?.toFixed(1),
-    rsiOk, bears, esto, estoOk, estoK: esto.k?.toFixed(1), estoD: esto.d?.toFixed(1),
-    filtros, cumple, pctMM,
-    candles: candles.slice(-20),
-    last3:   candles.slice(-3),
+    ...item, last, mm200:mm200?.toFixed(2), pctMM,
+    rsi:rsi?.toFixed(1), rsiOk,
+    bears, esto, estoOk,
+    estoK:esto.k?.toFixed(1), estoD:esto.d?.toFixed(1),
+    filtros, cumple,
+    candles:candles.slice(-20),
+    last3:candles.slice(-3),
   };
 }
 
-// ── SCAN PRINCIPAL ────────────────────────────
+// ── SCAN PRINCIPAL ──
 async function iniciarScan() {
-  const btn = document.getElementById('btnScan');
-  btn.disabled = true;
-  resultados = []; parciales = []; logLines = [];
-  document.getElementById('logBox').innerHTML = '';
-  document.getElementById('progWrap').style.display = 'block';
-  document.getElementById('rhEm').textContent = 'Escaneando…';
-  document.getElementById('rhCt').style.display = 'none';
-  document.getElementById('tableArea').innerHTML =
-    '<div class="empty"><span class="eb" style="animation:bl 1s infinite">…</span>Descargando histórico USD desde Stooq</div>';
+  const btn=document.getElementById('btnScan');
+  btn.disabled=true;
+  resultados=[]; parciales=[]; logLines=[];
+  document.getElementById('logBox').innerHTML='';
+  document.getElementById('progWrap').style.display='block';
+  document.getElementById('rhEm').textContent='Cargando universo…';
+  document.getElementById('rhCt').style.display='none';
+  document.getElementById('fCount').textContent='—';
+  document.getElementById('tableArea').innerHTML=
+    '<div class="empty"><span class="eb" style="animation:bl 1s infinite">…</span>Conectando con BYMA</div>';
 
-  log('=== INICIO SCAN CEDEAR USD ===', 'in');
-  log(`Universo: ${UNIVERSE.length} CEDEARs · Fuente: Stooq.com`, 'in');
+  setProgress(0,'CARGANDO UNIVERSO…','Intentando fetch desde BYMA');
 
-  const LOTE = 3;
-  let proc = 0;
+  // 1 — Intentar BYMA dinámico
+  UNIVERSE=[];
+  try {
+    const r=await fetch(BYMA_URL,{headers:{Accept:'application/json'},signal:AbortSignal.timeout(8000)});
+    const j=await r.json();
+    const raw=j.data||j||[];
+    const seen=new Set();
+    UNIVERSE=raw
+      .filter(d=>d.symbol||d.ticker)
+      .map(d=>{
+        const sym=(d.symbol||d.ticker||'').toUpperCase().trim();
+        return {sym, stooq:toStooq(sym), name:d.description||d.name||sym, ratio:d.ratio||1};
+      })
+      .filter(d=>d.sym.length>0 && !seen.has(d.sym) && seen.add(d.sym));
+    addLog(`Universo BYMA dinámico: ${UNIVERSE.length} CEDEARs`,'ok');
+  } catch(e) {
+    addLog(`BYMA no disponible (${e.message}) → usando lista hardcodeada`,'wa');
+    UNIVERSE=[...FALLBACK];
+  }
 
-  for (let i=0; i<UNIVERSE.length; i+=LOTE) {
-    const lote = UNIVERSE.slice(i, i+LOTE);
-    const res = await Promise.all(lote.map(c=>analizar(c).catch(()=>null)));
+  document.getElementById('uCount').textContent=UNIVERSE.length;
+  addLog(`=== SCAN: ${UNIVERSE.length} CEDEARs · RSI≤30 · 3 Velas · Esto K 5–25↑ ===`,'in');
 
-    res.forEach(r => {
+  // 2 — Procesar en lotes
+  const LOTE=3;
+  let proc=0;
+
+  for(let i=0;i<UNIVERSE.length;i+=LOTE) {
+    const lote=UNIVERSE.slice(i,i+LOTE);
+    const res=await Promise.all(lote.map(c=>analizar(c).catch(()=>null)));
+
+    res.forEach(r=>{
       proc++;
-      if (!r) return;
-      if (r.cumple===4) {
+      if(!r) return;
+      if(r.cumple===3) {
         resultados.push(r);
-        log(`★ SEÑAL COMPLETA: ${r.sym} | USD:$${r.last} MM200:${r.pctMM>0?'+':''}${r.pctMM}% RSI:${r.rsi} K:${r.estoK}`, 'ok');
-      } else if (r.cumple>=3) {
+        addLog(`★ 3/3: ${r.sym} | $${r.last} RSI:${r.rsi} K:${r.estoK} Bears:${r.bears?'✓':'✗'}`,'ok');
+      } else if(r.cumple===2) {
         parciales.push(r);
-        const falta = ['MM200','RSI','VELAS','ESTO'].filter((_,j)=>!r.filtros[j]).join(', ');
-        log(`~ PARCIAL (${r.cumple}/4): ${r.sym} | Falta: ${falta}`, 'wa');
+        const labels=['RSI','VELAS','ESTO'];
+        const falta=labels.filter((_,j)=>!r.filtros[j]).join(', ');
+        addLog(`~ 2/3: ${r.sym} | Falta: ${falta}`,'wa');
       } else {
-        log(`✗ ${r.sym} | ${r.cumple}/4 | RSI:${r.rsi} K:${r.estoK} MM:${r.pctMM}%`, 'in');
+        addLog(`✗ ${r.sym} | ${r.cumple}/3 | RSI:${r.rsi} K:${r.estoK}`,'in');
       }
     });
 
-    document.getElementById('fCount').textContent = resultados.length;
-    const pct = 2 + (proc/UNIVERSE.length)*96;
-    setProgress(pct, 'ANALIZANDO USD…', `${proc}/${UNIVERSE.length} · ${lote.map(c=>c.sym).join(', ')}`);
-
-    if (i+LOTE < UNIVERSE.length) await new Promise(r=>setTimeout(r,200));
+    document.getElementById('fCount').textContent=resultados.length;
+    const pct=2+(proc/UNIVERSE.length)*96;
+    setProgress(pct,'ANALIZANDO…',`${proc}/${UNIVERSE.length} · ${lote.map(c=>c.sym).join(', ')}`);
+    if(i+LOTE<UNIVERSE.length) await new Promise(r=>setTimeout(r,200));
   }
 
-  setProgress(100, 'COMPLETADO', `${resultados.length} señales completas · ${parciales.length} parciales`);
-  log(`=== FIN: ${resultados.length} completas · ${parciales.length} parciales ===`, 'ok');
+  setProgress(100,'COMPLETADO',`${resultados.length} señales 3/3 · ${parciales.length} parciales 2/3`);
+  addLog(`=== FIN: ${resultados.length} completas · ${parciales.length} parciales ===`,'ok');
 
-  const mostrar = resultados.length>0 ? resultados : parciales;
-  if (resultados.length===0 && parciales.length>0) {
-    document.getElementById('rhEm').textContent = `Sin señales 4/4 · Mostrando ${parciales.length} con 3/4 filtros`;
-  }
+  const mostrar=resultados.length>0?resultados:parciales;
+  if(resultados.length===0 && parciales.length>0)
+    document.getElementById('rhEm').textContent=`Sin 3/3 · Mostrando ${parciales.length} con 2/3 filtros`;
+  else if(resultados.length===0 && parciales.length===0)
+    document.getElementById('rhEm').textContent='Sin señales · Revisá el log';
+  else
+    document.getElementById('rhEm').textContent='';
 
   renderTabla(mostrar);
-  toast(`Scan completo · ${resultados.length} señales USD`);
-  btn.disabled = false;
+  showToast(`Scan completo · ${resultados.length} señales · ${UNIVERSE.length} CEDEARs`);
+  btn.disabled=false;
 }
 
-// ── RENDER ────────────────────────────────────
+// ── RENDER ──
 function renderTabla(items) {
-  if (!items.length) {
-    document.getElementById('tableArea').innerHTML =
-      '<div class="empty"><span class="eb">0</span>Sin señales con los 4 filtros · Revisá el log</div>';
+  const area=document.getElementById('tableArea');
+  if(!items.length) {
+    area.innerHTML='<div class="empty"><span class="eb">0</span>Sin señales · Revisá el log</div>';
+    document.getElementById('rhCt').style.display='none';
     return;
   }
+  document.getElementById('rhCt').style.display='inline';
+  document.getElementById('rhCt').textContent=`${items.length} señal${items.length>1?'es':''} · USD`;
 
-  document.getElementById('rhCt').style.display = 'inline';
-  document.getElementById('rhCt').textContent = `${items.length} señal${items.length>1?'es':''} · en USD`;
-  document.getElementById('rhEm').textContent = '';
-
-  const sorted = [...items].sort((a,b)=>{
-    const va = parseFloat(a[sortCol])||0;
-    const vb = parseFloat(b[sortCol])||0;
+  const sorted=[...items].sort((a,b)=>{
+    const va=parseFloat(a[sortCol])||0, vb=parseFloat(b[sortCol])||0;
     return sortDir==='asc'?va-vb:vb-va;
   });
 
-  document.getElementById('tableArea').innerHTML = `
+  area.innerHTML=`
   <table>
     <thead><tr>
       <th onclick="sortBy('sym')">CEDEAR</th>
       <th onclick="sortBy('last')">USD ÚLTIMO</th>
-      <th onclick="sortBy('pctMM')">vs MM200</th>
-      <th onclick="sortBy('rsi')">RSI</th>
-      <th>ÚLTIMAS 3</th>
-      <th onclick="sortBy('estoK')">ESTO K</th>
+      <th onclick="sortBy('pctMM')">vs MM200 (ref)</th>
+      <th onclick="sortBy('rsi')">RSI ≤ 30</th>
+      <th>3 VELAS BEAR</th>
+      <th onclick="sortBy('estoK')">ESTO K 5–25</th>
       <th onclick="sortBy('estoD')">ESTO D</th>
       <th>TENDENCIA</th>
       <th>SEÑAL</th>
       <th>ÚLTIMAS 20</th>
     </tr></thead>
-    <tbody>${sorted.map((r,i)=>fila(r,i)).join('')}</tbody>
+    <tbody>${sorted.map((r,i)=>renderFila(r,i)).join('')}</tbody>
   </table>`;
 
-  document.querySelectorAll('th').forEach(th=>{th.classList.remove('sa','sd')});
+  document.querySelectorAll('th').forEach(th=>th.classList.remove('sa','sd'));
 }
 
-function fila(r, i) {
-  const sc = r.cumple===4?'full':'part';
-  const st = r.cumple===4?'★ SEÑAL 4/4':`${r.cumple}/4 FILTROS`;
-  const rc = r.rsiOk?'c-amber':parseFloat(r.rsi)<20?'c-red':'c-muted';
-  const ec = r.estoOk?'c-purple':'c-muted';
-  const mc = r.sobreMM?'c-green':'c-red';
-  const sign = parseFloat(r.pctMM)>=0?'+':'';
+function renderFila(r,i) {
+  const sc=r.cumple===3?'full':'part';
+  const st=r.cumple===3?'★ SEÑAL 3/3':`${r.cumple}/3 FILTROS`;
+  const rc=r.rsiOk?'color:var(--amber)':'color:var(--muted)';
+  const ec=r.estoOk?'color:var(--purple)':'color:var(--muted)';
+  const mmc=r.pctMM?(parseFloat(r.pctMM)>=0?'color:var(--green)':'color:var(--red)'):'color:var(--muted)';
+  const sign=r.pctMM&&parseFloat(r.pctMM)>=0?'+':'';
 
-  // Mini chart
-  const mx = Math.max(...r.candles.map(c=>c.close));
-  const mn = Math.min(...r.candles.map(c=>c.close));
-  const rng = mx-mn||1;
-  const mini = r.candles.map(c=>{
-    const h = Math.max(4,((c.close-mn)/rng)*26);
+  const mx=Math.max(...r.candles.map(c=>c.close));
+  const mn=Math.min(...r.candles.map(c=>c.close));
+  const rng=mx-mn||1;
+  const mini=r.candles.map(c=>{
+    const h=Math.max(4,((c.close-mn)/rng)*26);
     return `<div class="mb ${c.close>=c.open?'u':'d'}" style="height:${h.toFixed(0)}px"></div>`;
   }).join('');
 
-  // 3 velas
-  const v3 = r.last3.map(c=>{
-    const h = Math.max(10,Math.abs(c.close-c.open)/c.close*350+10);
-    const cls = c.close<c.open?'b':c.close>c.open?'u':'d';
+  const v3=r.last3.map(c=>{
+    const h=Math.max(10,Math.abs(c.close-c.open)/c.close*350+10);
+    const cls=c.close<c.open?'b':c.close>c.open?'u':'d';
     return `<div class="vela ${cls}" style="height:${Math.min(h,26)}px"></div>`;
   }).join('');
 
@@ -594,27 +683,26 @@ function fila(r, i) {
       <span class="td-nm">${r.name}</span>
       <span class="td-src">${r.stooq}</span>
     </div></td>
-    <td style="font-family:'Space Mono',monospace;font-size:14px;color:var(--white)">
-      $${Number(r.last).toFixed(2)}
-    </td>
+    <td style="font-family:'Space Mono',monospace;font-size:14px;color:var(--white)">$${Number(r.last).toFixed(2)}</td>
     <td><div class="ind">
-      <span class="${mc}" style="font-family:'Space Mono',monospace;font-size:12px">${sign}${r.pctMM}%</span>
-      <span style="font-size:10px;color:var(--muted)">MM:$${Number(r.mm200).toFixed(2)}</span>
+      <span style="font-family:'Space Mono',monospace;font-size:12px;${mmc}">${r.pctMM?sign+r.pctMM+'%':'—'}</span>
+      <span style="font-size:10px;color:var(--muted)">${r.mm200?'MM:$'+r.mm200:'sin MM200'}</span>
     </div></td>
     <td><div class="ind">
-      <span class="${rc}" style="font-family:'Space Mono',monospace;font-size:14px;font-weight:700">${r.rsi}</span>
-      <div class="ind-bar"><div class="ind-fill" style="width:${r.rsi}%;background:${r.rsiOk?'var(--amber)':'var(--muted)'}"></div></div>
+      <span style="font-family:'Space Mono',monospace;font-size:14px;font-weight:700;${rc}">${r.rsi??'—'}</span>
+      <div class="ind-bar"><div class="ind-fill" style="width:${Math.min(r.rsi??0,100)}%;background:${r.rsiOk?'var(--amber)':'var(--muted)'}"></div></div>
     </div></td>
-    <td><div class="vcell">${v3}</div>
-      <div style="font-size:9px;color:${r.bears?'var(--red)':'var(--muted)'};margin-top:3px;font-family:'Space Mono',monospace">
+    <td>
+      <div class="vcell">${v3}</div>
+      <div style="font-size:9px;margin-top:3px;font-family:'Space Mono',monospace;color:${r.bears?'var(--red)':'var(--muted)'}">
         ${r.bears?'✓ 3 BEAR':'✗ NO'}
       </div>
     </td>
     <td><div class="ind">
-      <span class="${ec}" style="font-family:'Space Mono',monospace;font-size:14px;font-weight:700">${r.estoK}</span>
-      <div class="ind-bar"><div class="ind-fill" style="width:${r.estoK}%;background:${r.estoOk?'var(--purple)':'var(--muted)'}"></div></div>
+      <span style="font-family:'Space Mono',monospace;font-size:14px;font-weight:700;${ec}">${r.estoK??'—'}</span>
+      <div class="ind-bar"><div class="ind-fill" style="width:${Math.min(r.estoK??0,100)}%;background:${r.estoOk?'var(--purple)':'var(--muted)'}"></div></div>
     </div></td>
-    <td class="${ec}" style="font-family:'Space Mono',monospace;font-size:12px">${r.estoD}</td>
+    <td style="font-family:'Space Mono',monospace;font-size:12px;${ec}">${r.estoD??'—'}</td>
     <td style="font-family:'Space Mono',monospace;font-size:11px;color:${r.esto.trend==='up'?'var(--green)':'var(--muted)'}">
       ${r.esto.trend==='up'?'↑ GIRANDO':'↓ BAJA'}
     </td>
@@ -626,23 +714,21 @@ function fila(r, i) {
 function sortBy(col) {
   if(sortCol===col) sortDir=sortDir==='asc'?'desc':'asc';
   else{sortCol=col;sortDir='asc';}
-  const mostrar = resultados.length>0?resultados:parciales;
-  renderTabla(mostrar);
+  renderTabla(resultados.length>0?resultados:parciales);
 }
 
-// ── EXPORT ────────────────────────────────────
 function exportCSV() {
-  const data = resultados.length>0?resultados:parciales;
-  if(!data.length){toast('Sin datos');return;}
+  const data=resultados.length>0?resultados:parciales;
+  if(!data.length){showToast('Sin datos');return;}
   const rows=[
-    ['CEDEAR','Nombre','Stooq','USD Último','vs MM200%','MM200','RSI','Esto K','Esto D','Trend','3 Bears','Filtros'],
-    ...data.map(r=>[r.sym,r.name,r.stooq,r.last,r.pctMM,r.mm200,r.rsi,r.estoK,r.estoD,r.esto.trend,r.bears?'SI':'NO',r.cumple+'/4'])
+    ['CEDEAR','Nombre','Stooq','USD Último','vs MM200%','MM200','RSI','RSI OK','Esto K','Esto D','Trend','Esto OK','3 Bears','Filtros'],
+    ...data.map(r=>[r.sym,r.name,r.stooq,r.last,r.pctMM??'—',r.mm200??'—',r.rsi,r.rsiOk?'SI':'NO',r.estoK,r.estoD,r.esto.trend,r.estoOk?'SI':'NO',r.bears?'SI':'NO',r.cumple+'/3'])
   ];
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([rows.map(r=>r.join(',')).join('\n')],{type:'text/csv'}));
   a.download=`screener_usd_${new Date().toISOString().split('T')[0]}.csv`;
   a.click();
-  toast('CSV exportado');
+  showToast('CSV exportado');
 }
 </script>
 </body>
