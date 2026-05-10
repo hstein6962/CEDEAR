@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CEDEAR Screener · USD · Señal Reversal</title>
+<title>CEDEAR Screener · USD · Todos los CEDEARs BYMA</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -157,15 +157,14 @@ td{padding:11px 12px;vertical-align:middle;white-space:nowrap}
 
 <div class="hero">
   <div class="hero-bg">SCREENER USD</div>
-  <div class="hero-tag">BYMA · USD · SEÑAL REVERSAL · FINES DE SEMANA</div>
-  <h1>CEDEAR SCREENER<br><em>EN DÓLARES</em></h1>
-  <p class="hero-sub">Precios históricos en USD desde Stooq · Análisis técnico independiente del horario de BYMA · Usable fines de semana y feriados.</p>
+  <div class="hero-tag">BYMA · TODOS LOS CEDEARs · USD · FINES DE SEMANA Y FERIADOS</div>
+  <h1>CEDEAR SCREENER<br><em>UNIVERSO COMPLETO</em></h1>
+  <p class="hero-sub">Todos los CEDEARs operados en BYMA · Precios históricos en USD desde Stooq · Análisis técnico independiente del horario de mercado.</p>
   <div class="chips">
-    <div class="chip c1 on"><div class="cd"></div>MM200: PRECIO ARRIBA</div>
-    <div class="chip c2 on"><div class="cd"></div>RSI: 20–30</div>
-    <div class="chip c3 on"><div class="cd"></div>3 VELAS BAJISTAS</div>
-    <div class="chip c4 on"><div class="cd"></div>ESTOCÁSTICO 15–25 ↑</div>
-    <div class="chip c5 on"><div class="cd"></div>PRECIO EN USD</div>
+    <div class="chip c2 on"><div class="cd"></div>RSI ≤ 30</div>
+    <div class="chip c3 on"><div class="cd"></div>3 VELAS BAJISTAS CONSECUTIVAS</div>
+    <div class="chip c4 on"><div class="cd"></div>ESTOCÁSTICO 5–25 ↑</div>
+    <div class="chip c5 on"><div class="cd"></div>PRECIO EN USD · SIN RESTRICCIÓN MM200</div>
   </div>
 </div>
 
@@ -189,8 +188,8 @@ td{padding:11px 12px;vertical-align:middle;white-space:nowrap}
 </div>
 
 <div class="note">
-  ⚡ Fuente USD: <strong>Stooq.com</strong> (histórico EOD gratuito, sin API key) · Formato: AAPL.US, PBR.US, PETR3.SA (Brasil)<br>
-  Funciona fuera de horario BYMA · Los indicadores se calculan sobre la serie en USD del subyacente original.
+  ⚡ Fuente USD: <strong>Stooq.com</strong> (histórico EOD, sin API key) · Universo: todos los CEDEARs de BYMA (fetch dinámico)<br>
+  Filtros: RSI ≤ 30 · 3 velas bajistas consecutivas · Estocástico K entre 5 y 25 apuntando arriba · Sin restricción MM200.
 </div>
 
 <!-- ACTION BAR -->
@@ -235,74 +234,30 @@ td{padding:11px 12px;vertical-align:middle;white-space:nowrap}
 
 <script>
 // ══════════════════════════════════════════════
-//  TOP 50 CEDEARs más operados — ticker Stooq
-//  Formato: TICKER.US para NYSE/Nasdaq
-//           TICKER.SA para Bovespa (Brasil)
+//  UNIVERSO DINÁMICO — todos los CEDEARs BYMA
+//  Se construye haciendo fetch a open.bymadata.com.ar
+//  y mapeando cada ticker al formato Stooq (.US / .SA)
 // ══════════════════════════════════════════════
-const UNIVERSE = [
-  // TECH US
-  {sym:'AAPL',  stooq:'AAPL.US',  ratio:20,  name:'Apple Inc.'},
-  {sym:'NVDA',  stooq:'NVDA.US',  ratio:10,  name:'Nvidia Corp.'},
-  {sym:'MSFT',  stooq:'MSFT.US',  ratio:30,  name:'Microsoft'},
-  {sym:'AMZN',  stooq:'AMZN.US',  ratio:144, name:'Amazon'},
-  {sym:'GOOGL', stooq:'GOOGL.US', ratio:32,  name:'Alphabet'},
-  {sym:'META',  stooq:'META.US',  ratio:20,  name:'Meta Platforms'},
-  {sym:'TSLA',  stooq:'TSLA.US',  ratio:15,  name:'Tesla'},
-  {sym:'NFLX',  stooq:'NFLX.US',  ratio:90,  name:'Netflix'},
-  {sym:'AMD',   stooq:'AMD.US',   ratio:5,   name:'AMD'},
-  {sym:'INTC',  stooq:'INTC.US',  ratio:5,   name:'Intel'},
-  // FINANCE US
-  {sym:'JPM',   stooq:'JPM.US',   ratio:8,   name:'JPMorgan Chase'},
-  {sym:'BAC',   stooq:'BAC.US',   ratio:3,   name:'Bank of America'},
-  {sym:'GS',    stooq:'GS.US',    ratio:20,  name:'Goldman Sachs'},
-  {sym:'BRK/B', stooq:'BRK-B.US', ratio:10,  name:'Berkshire Hathaway B'},
-  {sym:'V',     stooq:'V.US',     ratio:10,  name:'Visa'},
-  {sym:'MA',    stooq:'MA.US',    ratio:18,  name:'Mastercard'},
-  // ENERGY
-  {sym:'XOM',   stooq:'XOM.US',   ratio:8,   name:'ExxonMobil'},
-  {sym:'CVX',   stooq:'CVX.US',   ratio:8,   name:'Chevron'},
-  {sym:'PBR',   stooq:'PBR.US',   ratio:6,   name:'Petrobras ADR'},
-  // BRASIL
-  {sym:'PETR3', stooq:'PETR3.SA', ratio:2,   name:'Petrobras ON (BRL)'},
-  {sym:'VALE3', stooq:'VALE3.SA', ratio:4,   name:'Vale ON (BRL)'},
-  // CONSUMER
-  {sym:'KO',    stooq:'KO.US',    ratio:6,   name:'Coca-Cola'},
-  {sym:'PEP',   stooq:'PEP.US',   ratio:12,  name:'PepsiCo'},
-  {sym:'MCD',   stooq:'MCD.US',   ratio:25,  name:'McDonald\'s'},
-  {sym:'DIS',   stooq:'DIS.US',   ratio:10,  name:'Disney'},
-  {sym:'NKE',   stooq:'NKE.US',   ratio:5,   name:'Nike'},
-  // LATAM
-  {sym:'MELI',  stooq:'MELI.US',  ratio:120, name:'MercadoLibre'},
-  // ETFs
-  {sym:'SPY',   stooq:'SPY.US',   ratio:25,  name:'SPDR S&P 500'},
-  {sym:'QQQ',   stooq:'QQQ.US',   ratio:20,  name:'Invesco QQQ'},
-  {sym:'GLD',   stooq:'GLD.US',   ratio:10,  name:'SPDR Gold'},
-  // HEALTH
-  {sym:'JNJ',   stooq:'JNJ.US',   ratio:12,  name:'Johnson & Johnson'},
-  {sym:'PFE',   stooq:'PFE.US',   ratio:4,   name:'Pfizer'},
-  {sym:'ABBV',  stooq:'ABBV.US',  ratio:12,  name:'AbbVie'},
-  {sym:'LLY',   stooq:'LLY.US',   ratio:100, name:'Eli Lilly'},
-  {sym:'MRK',   stooq:'MRK.US',   ratio:10,  name:'Merck'},
-  // INDUSTRIAL
-  {sym:'BA',    stooq:'BA.US',    ratio:40,  name:'Boeing'},
-  {sym:'CAT',   stooq:'CAT.US',   ratio:25,  name:'Caterpillar'},
-  {sym:'GE',    stooq:'GE.US',    ratio:10,  name:'GE Aerospace'},
-  {sym:'HON',   stooq:'HON.US',   ratio:20,  name:'Honeywell'},
-  // MATERIALS
-  {sym:'VALE',  stooq:'VALE.US',  ratio:4,   name:'Vale ADR (USD)'},
-  {sym:'FCX',   stooq:'FCX.US',   ratio:5,   name:'Freeport-McMoRan'},
-  // SEMI
-  {sym:'AVGO',  stooq:'AVGO.US',  ratio:30,  name:'Broadcom'},
-  {sym:'QCOM',  stooq:'QCOM.US',  ratio:10,  name:'Qualcomm'},
-  {sym:'MU',    stooq:'MU.US',    ratio:6,   name:'Micron'},
-  {sym:'ASML',  stooq:'ASML.US',  ratio:50,  name:'ASML Holding'},
-  // CLOUD / SOFTWARE
-  {sym:'CRM',   stooq:'CRM.US',   ratio:20,  name:'Salesforce'},
-  {sym:'ADBE',  stooq:'ADBE.US',  ratio:45,  name:'Adobe'},
-  {sym:'NOW',   stooq:'NOW.US',   ratio:50,  name:'ServiceNow'},
-  {sym:'ORCL',  stooq:'ORCL.US',  ratio:10,  name:'Oracle'},
-  {sym:'PYPL',  stooq:'PYPL.US',  ratio:6,   name:'PayPal'},
-];
+
+// Mapa de sufijos especiales (Brasil, etc.)
+const STOOQ_SUFFIX_MAP = {
+  'PETR3':'PETR3.SA','PETR4':'PETR4.SA','VALE3':'VALE3.SA',
+  'ITUB4':'ITUB4.SA','BBDC4':'BBDC4.SA','ABEV3':'ABEV3.SA',
+  'WEGE3':'WEGE3.SA','BBAS3':'BBAS3.SA','RENT3':'RENT3.SA',
+  'SUZB3':'SUZB3.SA','LREN3':'LREN3.SA','GGBR4':'GGBR4.SA',
+  'BRFS3':'BRFS3.SA','MGLU3':'MGLU3.SA','VBBR3':'VBBR3.SA',
+  'BRK/B':'BRK-B.US','BRK.B':'BRK-B.US',
+};
+
+function toStooqSym(sym) {
+  const up = sym.toUpperCase().trim();
+  if (STOOQ_SUFFIX_MAP[up]) return STOOQ_SUFFIX_MAP[up];
+  // Limpiar caracteres inválidos para Stooq
+  const clean = up.replace(/[^A-Z0-9\-]/g,'');
+  return clean + '.US';
+}
+
+let UNIVERSE = []; // se llena dinámicamente
 
 // ── ESTADO ───────────────────────────────────
 let resultados = [];
@@ -437,7 +392,7 @@ async function analizar(item) {
     return null;
   }
 
-  if (candles.length < 50) {
+  if (candles.length < 20) {
     log(`✗ ${item.sym}: solo ${candles.length} velas — insuficiente`, 'wa');
     return null;
   }
@@ -445,24 +400,31 @@ async function analizar(item) {
   const closes = candles.map(c=>c.close);
   const last   = closes[closes.length-1];
 
-  const mm200    = calcMM(closes, 200);
-  if (!mm200) { log(`✗ ${item.sym}: sin MM200 (${candles.length} velas)`, 'wa'); return null; }
+  // MM200 — solo informativa, no es filtro
+  const mm200  = calcMM(closes, 200);
+  const pctMM  = mm200 ? (((last-mm200)/mm200)*100).toFixed(2) : null;
 
-  const sobreMM  = last > mm200;
-  const rsi      = calcRSI(closes, 14);
-  const rsiOk    = rsi!==null && rsi>=20 && rsi<=30;
-  const bears    = check3Bears(candles);
-  const esto     = calcEsto(candles, 14, 3);
-  const estoOk   = esto.k!==null && esto.k>=15 && esto.k<=25 && esto.trend==='up';
+  // FILTRO 1: RSI ≤ 30 (sin límite inferior)
+  const rsi    = calcRSI(closes, 14);
+  const rsiOk  = rsi!==null && rsi<=30;
 
-  const filtros  = [sobreMM, rsiOk, bears, estoOk];
-  const cumple   = filtros.filter(Boolean).length;
-  const pctMM    = mm200 ? (((last-mm200)/mm200)*100).toFixed(2) : null;
+  // FILTRO 2: últimas 3 velas bajistas consecutivas
+  const bears  = check3Bears(candles);
+
+  // FILTRO 3: Estocástico K entre 5 y 25, apuntando arriba
+  const esto   = calcEsto(candles, 14, 3);
+  const estoOk = esto.k!==null && esto.k>=5 && esto.k<=25 && esto.trend==='up';
+
+  // 3 filtros activos (sin MM200)
+  const filtros = [rsiOk, bears, estoOk];
+  const cumple  = filtros.filter(Boolean).length;
 
   return {
-    ...item, last, mm200: mm200?.toFixed(3), sobreMM, rsi: rsi?.toFixed(1),
-    rsiOk, bears, esto, estoOk, estoK: esto.k?.toFixed(1), estoD: esto.d?.toFixed(1),
-    filtros, cumple, pctMM,
+    ...item, last, mm200: mm200?.toFixed(3), pctMM,
+    rsi: rsi?.toFixed(1), rsiOk,
+    bears, esto, estoOk,
+    estoK: esto.k?.toFixed(1), estoD: esto.d?.toFixed(1),
+    filtros, cumple,
     candles: candles.slice(-20),
     last3:   candles.slice(-3),
   };
@@ -475,13 +437,69 @@ async function iniciarScan() {
   resultados = []; parciales = []; logLines = [];
   document.getElementById('logBox').innerHTML = '';
   document.getElementById('progWrap').style.display = 'block';
-  document.getElementById('rhEm').textContent = 'Escaneando…';
+  document.getElementById('rhEm').textContent = 'Cargando universo BYMA…';
   document.getElementById('rhCt').style.display = 'none';
   document.getElementById('tableArea').innerHTML =
-    '<div class="empty"><span class="eb" style="animation:bl 1s infinite">…</span>Descargando histórico USD desde Stooq</div>';
+    '<div class="empty"><span class="eb" style="animation:bl 1s infinite">…</span>Trayendo lista de CEDEARs desde BYMA</div>';
 
-  log('=== INICIO SCAN CEDEAR USD ===', 'in');
-  log(`Universo: ${UNIVERSE.length} CEDEARs · Fuente: Stooq.com`, 'in');
+  log('=== INICIO SCAN — TODOS LOS CEDEARs BYMA ===', 'in');
+  setProgress(0, 'CARGANDO UNIVERSO BYMA…', 'Conectando con open.bymadata.com.ar');
+
+  // 1 — Fetch dinámico universo CEDEARs desde BYMA
+  try {
+    const r = await fetch('https://open.bymadata.com.ar/vanoms-be-core/rest/api/bymadata/free/bnown-cedears',
+      { headers:{ Accept:'application/json' } });
+    const j = await r.json();
+    const raw = j.data || j || [];
+    UNIVERSE = raw
+      .filter(d => d.symbol || d.ticker)
+      .map(d => {
+        const sym = (d.symbol || d.ticker || '').toUpperCase().trim();
+        return {
+          sym,
+          stooq: toStooqSym(sym),
+          name: d.description || d.name || sym,
+          ratio: d.ratio || d.conversionRate || 1,
+        };
+      })
+      .filter(d => d.sym.length > 0);
+
+    // Deduplicar por sym
+    const seen = new Set();
+    UNIVERSE = UNIVERSE.filter(d => { if(seen.has(d.sym)) return false; seen.add(d.sym); return true; });
+
+    log(`Universo BYMA: ${UNIVERSE.length} CEDEARs cargados`, 'ok');
+    document.getElementById('uCount').textContent = UNIVERSE.length;
+  } catch(e) {
+    log('Error cargando universo BYMA: ' + e.message, 'er');
+    log('Usando universo reducido de respaldo (50 CEDEARs)', 'wa');
+    // Fallback mínimo
+    UNIVERSE = [
+      {sym:'AAPL',stooq:'AAPL.US',ratio:20,name:'Apple'},
+      {sym:'NVDA',stooq:'NVDA.US',ratio:10,name:'Nvidia'},
+      {sym:'MSFT',stooq:'MSFT.US',ratio:30,name:'Microsoft'},
+      {sym:'AMZN',stooq:'AMZN.US',ratio:144,name:'Amazon'},
+      {sym:'GOOGL',stooq:'GOOGL.US',ratio:32,name:'Alphabet'},
+      {sym:'META',stooq:'META.US',ratio:20,name:'Meta'},
+      {sym:'TSLA',stooq:'TSLA.US',ratio:15,name:'Tesla'},
+      {sym:'SPY',stooq:'SPY.US',ratio:25,name:'SPDR S&P500'},
+      {sym:'QQQ',stooq:'QQQ.US',ratio:20,name:'Invesco QQQ'},
+      {sym:'MELI',stooq:'MELI.US',ratio:120,name:'MercadoLibre'},
+      {sym:'PBR',stooq:'PBR.US',ratio:6,name:'Petrobras ADR'},
+      {sym:'PETR3',stooq:'PETR3.SA',ratio:2,name:'Petrobras ON'},
+      {sym:'VALE',stooq:'VALE.US',ratio:4,name:'Vale ADR'},
+      {sym:'VALE3',stooq:'VALE3.SA',ratio:4,name:'Vale ON'},
+      {sym:'KO',stooq:'KO.US',ratio:6,name:'Coca-Cola'},
+      {sym:'PEP',stooq:'PEP.US',ratio:12,name:'PepsiCo'},
+      {sym:'MCD',stooq:'MCD.US',ratio:25,name:'McDonald\'s'},
+      {sym:'JPM',stooq:'JPM.US',ratio:8,name:'JPMorgan'},
+      {sym:'BAC',stooq:'BAC.US',ratio:3,name:'Bank of America'},
+      {sym:'XOM',stooq:'XOM.US',ratio:8,name:'ExxonMobil'},
+    ];
+    document.getElementById('uCount').textContent = UNIVERSE.length + ' (respaldo)';
+  }
+
+  log(`Filtros: RSI ≤ 30 · 3 velas bajistas · Estocástico 5–25 ↑`, 'in');
 
   const LOTE = 3;
   let proc = 0;
@@ -493,35 +511,36 @@ async function iniciarScan() {
     res.forEach(r => {
       proc++;
       if (!r) return;
-      if (r.cumple===4) {
+      if (r.cumple===3) {
         resultados.push(r);
-        log(`★ SEÑAL COMPLETA: ${r.sym} | USD:$${r.last} MM200:${r.pctMM>0?'+':''}${r.pctMM}% RSI:${r.rsi} K:${r.estoK}`, 'ok');
-      } else if (r.cumple>=3) {
+        log(`★ SEÑAL 3/3: ${r.sym} | USD:$${r.last} RSI:${r.rsi} K:${r.estoK} Bears:${r.bears?'✓':'✗'}`, 'ok');
+      } else if (r.cumple===2) {
         parciales.push(r);
-        const falta = ['MM200','RSI','VELAS','ESTO'].filter((_,j)=>!r.filtros[j]).join(', ');
-        log(`~ PARCIAL (${r.cumple}/4): ${r.sym} | Falta: ${falta}`, 'wa');
+        const labels = ['RSI','VELAS','ESTO'];
+        const falta = labels.filter((_,j)=>!r.filtros[j]).join(', ');
+        log(`~ PARCIAL (2/3): ${r.sym} | Falta: ${falta}`, 'wa');
       } else {
-        log(`✗ ${r.sym} | ${r.cumple}/4 | RSI:${r.rsi} K:${r.estoK} MM:${r.pctMM}%`, 'in');
+        log(`✗ ${r.sym} | ${r.cumple}/3 | RSI:${r.rsi} K:${r.estoK}`, 'in');
       }
     });
 
     document.getElementById('fCount').textContent = resultados.length;
     const pct = 2 + (proc/UNIVERSE.length)*96;
-    setProgress(pct, 'ANALIZANDO USD…', `${proc}/${UNIVERSE.length} · ${lote.map(c=>c.sym).join(', ')}`);
+    setProgress(pct, 'ANALIZANDO…', `${proc}/${UNIVERSE.length} · ${lote.map(c=>c.sym).join(', ')}`);
 
     if (i+LOTE < UNIVERSE.length) await new Promise(r=>setTimeout(r,200));
   }
 
-  setProgress(100, 'COMPLETADO', `${resultados.length} señales completas · ${parciales.length} parciales`);
-  log(`=== FIN: ${resultados.length} completas · ${parciales.length} parciales ===`, 'ok');
+  setProgress(100, 'COMPLETADO', `${resultados.length} señales completas · ${parciales.length} parciales (2/3)`);
+  log(`=== FIN: ${resultados.length} señales 3/3 · ${parciales.length} parciales ===`, 'ok');
 
   const mostrar = resultados.length>0 ? resultados : parciales;
   if (resultados.length===0 && parciales.length>0) {
-    document.getElementById('rhEm').textContent = `Sin señales 4/4 · Mostrando ${parciales.length} con 3/4 filtros`;
+    document.getElementById('rhEm').textContent = `Sin señales 3/3 · Mostrando ${parciales.length} con 2/3 filtros`;
   }
 
   renderTabla(mostrar);
-  toast(`Scan completo · ${resultados.length} señales USD`);
+  toast(`Scan completo · ${resultados.length} señales · ${UNIVERSE.length} CEDEARs analizados`);
   btn.disabled = false;
 }
 
@@ -529,7 +548,7 @@ async function iniciarScan() {
 function renderTabla(items) {
   if (!items.length) {
     document.getElementById('tableArea').innerHTML =
-      '<div class="empty"><span class="eb">0</span>Sin señales con los 4 filtros · Revisá el log</div>';
+      '<div class="empty"><span class="eb">0</span>Sin señales · Revisá el log para ver qué filtros casi se cumplen</div>';
     return;
   }
 
@@ -548,10 +567,10 @@ function renderTabla(items) {
     <thead><tr>
       <th onclick="sortBy('sym')">CEDEAR</th>
       <th onclick="sortBy('last')">USD ÚLTIMO</th>
-      <th onclick="sortBy('pctMM')">vs MM200</th>
-      <th onclick="sortBy('rsi')">RSI</th>
-      <th>ÚLTIMAS 3</th>
-      <th onclick="sortBy('estoK')">ESTO K</th>
+      <th onclick="sortBy('pctMM')">vs MM200 (ref)</th>
+      <th onclick="sortBy('rsi')">RSI ≤30</th>
+      <th>3 VELAS BEAR</th>
+      <th onclick="sortBy('estoK')">ESTO K 5–25</th>
       <th onclick="sortBy('estoD')">ESTO D</th>
       <th>TENDENCIA</th>
       <th>SEÑAL</th>
@@ -564,12 +583,12 @@ function renderTabla(items) {
 }
 
 function fila(r, i) {
-  const sc = r.cumple===4?'full':'part';
-  const st = r.cumple===4?'★ SEÑAL 4/4':`${r.cumple}/4 FILTROS`;
-  const rc = r.rsiOk?'c-amber':parseFloat(r.rsi)<20?'c-red':'c-muted';
+  const sc = r.cumple===3?'full':'part';
+  const st = r.cumple===3?'★ SEÑAL 3/3':`${r.cumple}/3 FILTROS`;
+  const rc = r.rsiOk?'c-amber':'c-muted';
   const ec = r.estoOk?'c-purple':'c-muted';
-  const mc = r.sobreMM?'c-green':'c-red';
-  const sign = parseFloat(r.pctMM)>=0?'+':'';
+  const mmColor = r.pctMM!==null ? (parseFloat(r.pctMM)>=0?'c-green':'c-red') : 'c-muted';
+  const sign = r.pctMM!==null && parseFloat(r.pctMM)>=0?'+':'';
 
   // Mini chart
   const mx = Math.max(...r.candles.map(c=>c.close));
@@ -580,7 +599,7 @@ function fila(r, i) {
     return `<div class="mb ${c.close>=c.open?'u':'d'}" style="height:${h.toFixed(0)}px"></div>`;
   }).join('');
 
-  // 3 velas
+  // 3 velas bajistas
   const v3 = r.last3.map(c=>{
     const h = Math.max(10,Math.abs(c.close-c.open)/c.close*350+10);
     const cls = c.close<c.open?'b':c.close>c.open?'u':'d';
@@ -598,12 +617,12 @@ function fila(r, i) {
       $${Number(r.last).toFixed(2)}
     </td>
     <td><div class="ind">
-      <span class="${mc}" style="font-family:'Space Mono',monospace;font-size:12px">${sign}${r.pctMM}%</span>
-      <span style="font-size:10px;color:var(--muted)">MM:$${Number(r.mm200).toFixed(2)}</span>
+      <span class="${mmColor}" style="font-family:'Space Mono',monospace;font-size:12px">${r.pctMM!==null?sign+r.pctMM+'%':'—'}</span>
+      <span style="font-size:10px;color:var(--muted)">${r.mm200?'MM:$'+Number(r.mm200).toFixed(2):'sin MM200'}</span>
     </div></td>
     <td><div class="ind">
-      <span class="${rc}" style="font-family:'Space Mono',monospace;font-size:14px;font-weight:700">${r.rsi}</span>
-      <div class="ind-bar"><div class="ind-fill" style="width:${r.rsi}%;background:${r.rsiOk?'var(--amber)':'var(--muted)'}"></div></div>
+      <span class="${rc}" style="font-family:'Space Mono',monospace;font-size:14px;font-weight:700">${r.rsi??'—'}</span>
+      <div class="ind-bar"><div class="ind-fill" style="width:${Math.min(r.rsi??0,100)}%;background:${r.rsiOk?'var(--amber)':'var(--muted)'}"></div></div>
     </div></td>
     <td><div class="vcell">${v3}</div>
       <div style="font-size:9px;color:${r.bears?'var(--red)':'var(--muted)'};margin-top:3px;font-family:'Space Mono',monospace">
@@ -611,10 +630,10 @@ function fila(r, i) {
       </div>
     </td>
     <td><div class="ind">
-      <span class="${ec}" style="font-family:'Space Mono',monospace;font-size:14px;font-weight:700">${r.estoK}</span>
-      <div class="ind-bar"><div class="ind-fill" style="width:${r.estoK}%;background:${r.estoOk?'var(--purple)':'var(--muted)'}"></div></div>
+      <span class="${ec}" style="font-family:'Space Mono',monospace;font-size:14px;font-weight:700">${r.estoK??'—'}</span>
+      <div class="ind-bar"><div class="ind-fill" style="width:${Math.min(r.estoK??0,100)}%;background:${r.estoOk?'var(--purple)':'var(--muted)'}"></div></div>
     </div></td>
-    <td class="${ec}" style="font-family:'Space Mono',monospace;font-size:12px">${r.estoD}</td>
+    <td class="${ec}" style="font-family:'Space Mono',monospace;font-size:12px">${r.estoD??'—'}</td>
     <td style="font-family:'Space Mono',monospace;font-size:11px;color:${r.esto.trend==='up'?'var(--green)':'var(--muted)'}">
       ${r.esto.trend==='up'?'↑ GIRANDO':'↓ BAJA'}
     </td>
@@ -635,8 +654,8 @@ function exportCSV() {
   const data = resultados.length>0?resultados:parciales;
   if(!data.length){toast('Sin datos');return;}
   const rows=[
-    ['CEDEAR','Nombre','Stooq','USD Último','vs MM200%','MM200','RSI','Esto K','Esto D','Trend','3 Bears','Filtros'],
-    ...data.map(r=>[r.sym,r.name,r.stooq,r.last,r.pctMM,r.mm200,r.rsi,r.estoK,r.estoD,r.esto.trend,r.bears?'SI':'NO',r.cumple+'/4'])
+    ['CEDEAR','Nombre','Stooq','USD Último','vs MM200%','MM200','RSI','RSI OK','Esto K','Esto D','Trend','Esto OK','3 Bears','Filtros cumplidos'],
+    ...data.map(r=>[r.sym,r.name,r.stooq,r.last,r.pctMM??'—',r.mm200??'—',r.rsi,r.rsiOk?'SI':'NO',r.estoK,r.estoD,r.esto.trend,r.estoOk?'SI':'NO',r.bears?'SI':'NO',r.cumple+'/3'])
   ];
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([rows.map(r=>r.join(',')).join('\n')],{type:'text/csv'}));
